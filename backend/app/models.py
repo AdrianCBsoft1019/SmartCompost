@@ -5,6 +5,7 @@ base necesarias para login/roles y para dar soporte a los CRUDs
 iniciales (Usuario, Pila, Sensor). Lecturas/Alertas/Intervenciones se
 amplian en sprints posteriores (adquisicion de datos y reglas).
 """
+
 import enum
 import uuid
 from datetime import datetime
@@ -22,7 +23,8 @@ def gen_uuid():
 # MySQL/MariaDB (XAMPP) no tiene un tipo UUID nativo como PostgreSQL,
 # asi que los identificadores se guardan como texto de 36 caracteres
 # (formato UUID estandar, ej. "550e8400-e29b-41d4-a716-446655440000").
-UUID = lambda **kwargs: String(36)  # noqa: E731 - alias simple para no reescribir cada columna
+def UUID(**kwargs):
+    return String(36)
 
 
 class RolUsuario(str, enum.Enum):
@@ -32,6 +34,7 @@ class RolUsuario(str, enum.Enum):
 
 class Usuario(Base):
     """HU-10: Acceso por roles."""
+
     __tablename__ = "usuarios"
 
     id = Column(UUID(as_uuid=False), primary_key=True, default=gen_uuid)
@@ -48,6 +51,7 @@ class Usuario(Base):
 
 class Pila(Base):
     """Pila de compostaje monitoreada por el sistema."""
+
     __tablename__ = "pilas"
 
     id = Column(UUID(as_uuid=False), primary_key=True, default=gen_uuid)
@@ -55,12 +59,16 @@ class Pila(Base):
     ubicacion = Column(String(150), nullable=True)
     latitud = Column(Float, nullable=True)
     longitud = Column(Float, nullable=True)
-    estado = Column(String(30), default="normal")  # normal | advertencia | critico
-    responsable_id = Column(UUID(as_uuid=False), ForeignKey("usuarios.id"), nullable=True)
+    estado = Column(String(30), default="normal")
+    responsable_id = Column(
+        UUID(as_uuid=False), ForeignKey("usuarios.id"), nullable=True
+    )
     creado_en = Column(DateTime, default=datetime.utcnow)
 
     responsable = relationship("Usuario", back_populates="pilas")
-    sensores = relationship("Sensor", back_populates="pila", cascade="all, delete-orphan")
+    sensores = relationship(
+        "Sensor", back_populates="pila", cascade="all, delete-orphan"
+    )
 
 
 class TipoSensor(str, enum.Enum):
@@ -73,6 +81,7 @@ class TipoSensor(str, enum.Enum):
 
 class Sensor(Base):
     """Sensor fisico asociado a una pila (soporta HU-01, HU-02, HU-03, HU-13, HU-15)."""
+
     __tablename__ = "sensores"
 
     id = Column(UUID(as_uuid=False), primary_key=True, default=gen_uuid)

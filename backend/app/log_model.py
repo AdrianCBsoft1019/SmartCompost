@@ -5,6 +5,7 @@ Requisito del Modulo Transversal: tabla independiente, SIN llaves
 foraneas complejas, para registrar eventos criticos del sistema
 (errores de conexion a BD, intentos de login fallidos, etc.)
 """
+
 import enum
 import uuid
 from datetime import datetime

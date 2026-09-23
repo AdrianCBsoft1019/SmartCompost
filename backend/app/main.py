@@ -6,6 +6,7 @@ y CRUDs de las entidades principales (Usuarios, Pilas, Sensores).
 
 Modulo Transversal (Fase 2): Health Check + Trazabilidad ciega (system_logs).
 """
+
 import time
 from datetime import datetime
 
@@ -27,7 +28,10 @@ _INICIO_SERVIDOR = time.time()
 
 app = FastAPI(
     title="SmartCompost API",
-    description="Backend del sistema de monitoreo de compostaje - Centro de Biotecnologia Agropecuaria SENA Mosquera",
+    description=(
+        "Backend del sistema de monitoreo de compostaje - "
+        "Centro de Biotecnologia Agropecuaria SENA Mosquera"
+    ),
     version="0.2.0-modulo-transversal",
 )
 
@@ -76,7 +80,10 @@ def health_check(request: Request):
         db_status = "down"
         db_error = str(exc)
         origen_ip = request.client.host if request.client else None
-        log_error_bd(f"Fallo el ping de /api/health a la base de datos: {exc}", origen_ip)
+        log_error_bd(
+            f"Fallo el ping de /api/health a la base de datos: {exc}",
+            origen_ip,
+        )
     finally:
         db.close()
 
@@ -89,4 +96,3 @@ def health_check(request: Request):
             "error": db_error,
         },
     }
-

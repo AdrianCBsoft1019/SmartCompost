@@ -10,6 +10,7 @@ de camino. Si el propio intento de escribir el log falla (por ejemplo,
 la base de datos esta completamente caida), se hace un fallback a un
 archivo de log local para no perder la evidencia del incidente.
 """
+
 import logging
 from pathlib import Path
 
@@ -25,7 +26,9 @@ if not _fallback_logger.handlers:
     _fallback_logger.addHandler(_handler)
 
 
-def registrar_evento(nivel: NivelLog, mensaje: str, origen_ip: str | None = None) -> None:
+def registrar_evento(
+    nivel: NivelLog, mensaje: str, origen_ip: str | None = None
+) -> None:
     """Inserta un registro en system_logs. Nunca lanza excepcion hacia
     arriba: un fallo al loggear no debe tumbar la request original."""
     db = SessionLocal()
@@ -36,7 +39,9 @@ def registrar_evento(nivel: NivelLog, mensaje: str, origen_ip: str | None = None
     except Exception as exc:  # noqa: BLE001 - logging defensivo a proposito
         # Fallback: si ni siquiera se puede escribir en system_logs
         # (ej. la BD esta totalmente caida), no perdemos el evento.
-        _fallback_logger.error("No se pudo escribir en system_logs: %s | evento original: %s", exc, mensaje)
+        _fallback_logger.error(
+            "No se pudo escribir en system_logs: %s | evento original: %s", exc, mensaje
+        )
     finally:
         db.close()
 

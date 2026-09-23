@@ -23,7 +23,9 @@ def crear_sensor(
         .first()
     )
     if existente:
-        raise HTTPException(status_code=400, detail="El codigo de dispositivo ya esta registrado")
+        raise HTTPException(
+            status_code=400, detail="El codigo de dispositivo ya esta registrado"
+        )
 
     nuevo_sensor = models.Sensor(**datos.model_dump())
     db.add(nuevo_sensor)
@@ -77,7 +79,9 @@ def actualizar_sensor(
 def eliminar_sensor(
     sensor_id: str,
     db: Session = Depends(get_db),
-    current_user: models.Usuario = Depends(security.require_role(models.RolUsuario.instructor)),
+    current_user: models.Usuario = Depends(
+        security.require_role(models.RolUsuario.instructor)
+    ),
 ):
     sensor = db.query(models.Sensor).filter(models.Sensor.id == sensor_id).first()
     if not sensor:

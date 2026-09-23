@@ -61,7 +61,9 @@ def actualizar_pila(
 def eliminar_pila(
     pila_id: str,
     db: Session = Depends(get_db),
-    current_user: models.Usuario = Depends(security.require_role(models.RolUsuario.instructor)),
+    current_user: models.Usuario = Depends(
+        security.require_role(models.RolUsuario.instructor)
+    ),
 ):
     pila = db.query(models.Pila).filter(models.Pila.id == pila_id).first()
     if not pila:

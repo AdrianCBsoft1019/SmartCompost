@@ -3,6 +3,7 @@ Hash de contrasenas (bcrypt) y emision/validacion de JWT.
 
 Cumple HU-10.4: "Contrasenas no se almacenan en texto plano".
 """
+
 import os
 from datetime import datetime, timedelta
 from typing import Optional
@@ -37,7 +38,9 @@ def verify_password(plain_password: str, hashed_password: str) -> bool:
 
 def create_access_token(data: dict, expires_delta: Optional[timedelta] = None) -> str:
     to_encode = data.copy()
-    expire = datetime.utcnow() + (expires_delta or timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES))
+    expire = datetime.utcnow() + (
+        expires_delta or timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+    )
     to_encode.update({"exp": expire})
     return jwt.encode(to_encode, JWT_SECRET_KEY, algorithm=JWT_ALGORITHM)
 

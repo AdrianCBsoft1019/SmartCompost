@@ -10,7 +10,9 @@ router = APIRouter(prefix="/usuarios", tags=["Usuarios"])
 @router.get("/", response_model=list[schemas.UsuarioOut])
 def listar_usuarios(
     db: Session = Depends(get_db),
-    current_user: models.Usuario = Depends(security.require_role(models.RolUsuario.instructor)),
+    current_user: models.Usuario = Depends(
+        security.require_role(models.RolUsuario.instructor)
+    ),
 ):
     """Solo el rol instructor puede listar todos los usuarios (HU-10.2)."""
     return db.query(models.Usuario).all()
@@ -33,7 +35,9 @@ def actualizar_rol(
     usuario_id: str,
     datos: schemas.UsuarioUpdateRol,
     db: Session = Depends(get_db),
-    current_user: models.Usuario = Depends(security.require_role(models.RolUsuario.instructor)),
+    current_user: models.Usuario = Depends(
+        security.require_role(models.RolUsuario.instructor)
+    ),
 ):
     usuario = db.query(models.Usuario).filter(models.Usuario.id == usuario_id).first()
     if not usuario:
@@ -48,7 +52,9 @@ def actualizar_rol(
 def desactivar_usuario(
     usuario_id: str,
     db: Session = Depends(get_db),
-    current_user: models.Usuario = Depends(security.require_role(models.RolUsuario.instructor)),
+    current_user: models.Usuario = Depends(
+        security.require_role(models.RolUsuario.instructor)
+    ),
 ):
     usuario = db.query(models.Usuario).filter(models.Usuario.id == usuario_id).first()
     if not usuario:
