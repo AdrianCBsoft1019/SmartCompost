@@ -5,9 +5,6 @@ import '../services/api_service.dart';
 import '../models/rol_usuario.dart';
 import 'login_screen.dart';
 
-/// Pantalla de Registro — replica el mockup "SmartCompost - Registro (Oscuro)".
-/// HU-10: crea un usuario con rol (instructor/aprendiz); la contraseña
-/// nunca se envia ni se guarda en texto plano (se hashea en el backend).
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
 

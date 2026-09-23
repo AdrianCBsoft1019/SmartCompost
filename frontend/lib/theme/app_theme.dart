@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 
-/// Paleta extraida del mockup de diseño (login/registro oscuro,
-/// acento verde) adaptada de marca a SmartCompost.
 class AppColors {
   static const background = Color(0xFF0B0D10);
   static const surface = Color(0xFF15181D);

@@ -2,12 +2,6 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
-/// Cliente HTTP hacia el backend SmartCompost (FastAPI).
-///
-/// Ajusta [baseUrl] segun el entorno:
-///  - Emulador Android -> http://10.0.2.2:8000
-///  - iOS simulator / web -> http://localhost:8000
-///  - Dispositivo fisico -> http://<ip-de-tu-maquina>:8000
 class ApiService {
   static const String baseUrl = String.fromEnvironment(
     'API_BASE_URL',
@@ -40,7 +34,6 @@ class ApiService {
     throw ApiException(_extraerError(resp));
   }
 
-  /// HU-10: login, valida credenciales y guarda el token JWT.
   Future<Map<String, dynamic>> login({
     required String correo,
     required String password,

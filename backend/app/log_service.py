@@ -1,16 +1,3 @@
-"""
-Servicio de trazabilidad. Escribe en la tabla `system_logs` cada vez que:
-  - ocurre un error de conexion/consulta a la base de datos, o
-  - se produce un intento de login fallido (password incorrecto).
-
-Usa una sesion propia y de corta duracion (independiente de la sesion
-de la request que fallo) para maximizar la probabilidad de que el
-registro sí se guarde incluso si la operacion original fallo a mitad
-de camino. Si el propio intento de escribir el log falla (por ejemplo,
-la base de datos esta completamente caida), se hace un fallback a un
-archivo de log local para no perder la evidencia del incidente.
-"""
-
 import logging
 from pathlib import Path
 
@@ -36,9 +23,7 @@ def registrar_evento(
         entrada = SystemLog(nivel=nivel, mensaje=mensaje[:500], origen_ip=origen_ip)
         db.add(entrada)
         db.commit()
-    except Exception as exc:  # noqa: BLE001 - logging defensivo a proposito
-        # Fallback: si ni siquiera se puede escribir en system_logs
-        # (ej. la BD esta totalmente caida), no perdemos el evento.
+    except Exception as exc:  
         _fallback_logger.error(
             "No se pudo escribir en system_logs: %s | evento original: %s", exc, mensaje
         )

@@ -4,8 +4,6 @@ import '../theme/app_theme.dart';
 import '../services/api_service.dart';
 import 'register_screen.dart';
 
-/// Pantalla de Login — replica el mockup "SmartCompost - Login (Oscuro)".
-/// HU-10: el usuario introduce credenciales que se validan contra el backend.
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
 
@@ -40,7 +38,6 @@ class _LoginScreenState extends State<LoginScreen> {
     try {
       await _api.login(correo: _correoCtrl.text.trim(), password: _passwordCtrl.text);
       if (!mounted) return;
-      // Sprint 3+ conectara aqui con el Dashboard real.
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Sesion iniciada correctamente')),
       );

@@ -1,11 +1,3 @@
-"""
-Modelos ORM de las entidades principales del MER (seccion 2.3 del
-documento del proyecto). En Sprint 1-2 solo se modelan las entidades
-base necesarias para login/roles y para dar soporte a los CRUDs
-iniciales (Usuario, Pila, Sensor). Lecturas/Alertas/Intervenciones se
-amplian en sprints posteriores (adquisicion de datos y reglas).
-"""
-
 import enum
 import uuid
 from datetime import datetime
@@ -19,10 +11,6 @@ from .database import Base
 def gen_uuid():
     return str(uuid.uuid4())
 
-
-# MySQL/MariaDB (XAMPP) no tiene un tipo UUID nativo como PostgreSQL,
-# asi que los identificadores se guardan como texto de 36 caracteres
-# (formato UUID estandar, ej. "550e8400-e29b-41d4-a716-446655440000").
 def UUID(**kwargs):
     return String(36)
 
@@ -40,7 +28,6 @@ class Usuario(Base):
     id = Column(UUID(as_uuid=False), primary_key=True, default=gen_uuid)
     nombre_completo = Column(String(150), nullable=False)
     correo = Column(String(150), unique=True, index=True, nullable=False)
-    # Nunca se almacena la contrasena en texto plano (criterio HU-10.4)
     password_hash = Column(String(255), nullable=False)
     rol = Column(Enum(RolUsuario), nullable=False, default=RolUsuario.aprendiz)
     activo = Column(Boolean, default=True)
@@ -80,7 +67,6 @@ class TipoSensor(str, enum.Enum):
 
 
 class Sensor(Base):
-    """Sensor fisico asociado a una pila (soporta HU-01, HU-02, HU-03, HU-13, HU-15)."""
 
     __tablename__ = "sensores"
 
