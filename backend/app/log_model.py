@@ -10,6 +10,7 @@ from .database import Base
 def gen_uuid():
     return str(uuid.uuid4())
 
+
 UUID = lambda **kwargs: String(36)  # noqa: E731
 
 
@@ -27,4 +28,3 @@ class SystemLog(Base):
     nivel = Column(Enum(NivelLog), nullable=False, default=NivelLog.INFO)
     origen_ip = Column(String(45), nullable=True)  #
     mensaje = Column(String(500), nullable=False)
-

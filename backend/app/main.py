@@ -8,7 +8,7 @@ from sqlalchemy.exc import OperationalError
 
 from .database import Base, engine, SessionLocal
 from .routers import auth, usuarios, pilas, sensores
-from . import log_model  
+from . import log_model  # noqa: F401
 from .log_service import log_error_bd
 
 Base.metadata.create_all(bind=engine)

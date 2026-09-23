@@ -23,7 +23,7 @@ def registrar_evento(
         entrada = SystemLog(nivel=nivel, mensaje=mensaje[:500], origen_ip=origen_ip)
         db.add(entrada)
         db.commit()
-    except Exception as exc:  
+    except Exception as exc:
         _fallback_logger.error(
             "No se pudo escribir en system_logs: %s | evento original: %s", exc, mensaje
         )

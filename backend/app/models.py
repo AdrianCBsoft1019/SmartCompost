@@ -11,6 +11,7 @@ from .database import Base
 def gen_uuid():
     return str(uuid.uuid4())
 
+
 def UUID(**kwargs):
     return String(36)
 

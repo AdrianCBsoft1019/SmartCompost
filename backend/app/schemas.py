@@ -5,7 +5,6 @@ from pydantic import BaseModel, EmailStr, Field
 from .models import RolUsuario, TipoSensor
 
 
-
 class UsuarioRegistro(BaseModel):
     nombre_completo: str = Field(min_length=3, max_length=150)
     correo: EmailStr
@@ -40,7 +39,6 @@ class Token(BaseModel):
     usuario: UsuarioOut
 
 
-
 class PilaCreate(BaseModel):
     nombre: str = Field(min_length=2, max_length=100)
     ubicacion: Optional[str] = None
@@ -70,8 +68,6 @@ class PilaOut(BaseModel):
 
     class Config:
         from_attributes = True
-
-
 
 
 class SensorCreate(BaseModel):
