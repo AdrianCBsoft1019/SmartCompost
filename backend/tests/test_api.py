@@ -101,3 +101,53 @@ def test_perfil_propio_y_gestion_de_usuarios(client, admin, estudiante):
     assert client.delete(f"/usuarios/{uid}", headers=admin).status_code == 204
     yo = client.get("/usuarios/me", headers=admin).json()
     assert client.delete(f"/usuarios/{yo['id']}", headers=admin).status_code == 400
+
+
+def _imagen(formato="PNG", tamano=(600, 400)):
+    import io
+
+    from PIL import Image
+
+    buffer = io.BytesIO()
+    Image.new("RGB", tamano, (200, 30, 30)).save(buffer, format=formato)
+    return buffer.getvalue()
+
+
+def test_foto_de_perfil_admin_y_estudiante(client, admin, estudiante):
+    import io
+
+    from PIL import Image
+
+    for headers in (admin, estudiante):
+        r = client.post(
+            "/usuarios/me/foto",
+            files={"archivo": ("foto.png", _imagen(), "image/png")},
+            headers=headers,
+        )
+        assert r.status_code == 200 and r.json()["tiene_foto"] is True
+        foto = client.get("/usuarios/me/foto", headers=headers)
+        assert foto.headers["content-type"] == "image/png"
+        assert Image.open(io.BytesIO(foto.content)).size == (256, 256)
+
+    yo_estudiante = client.get("/usuarios/me", headers=estudiante).json()
+    assert yo_estudiante["tiene_foto"] is True
+    ver = client.get(f"/usuarios/{yo_estudiante['id']}/foto", headers=admin)
+    assert ver.status_code == 200
+
+    r = client.delete("/usuarios/me/foto", headers=estudiante)
+    assert r.json()["tiene_foto"] is False
+    assert client.get("/usuarios/me/foto", headers=estudiante).status_code == 404
+
+
+def test_foto_de_perfil_rechaza_archivos_invalidos(client, admin):
+    def subir(nombre, contenido, tipo):
+        return client.post(
+            "/usuarios/me/foto",
+            files={"archivo": (nombre, contenido, tipo)},
+            headers=admin,
+        )
+
+    assert subir("x.png", b"esto no es una imagen", "image/png").status_code == 400
+    assert subir("a.gif", _imagen("GIF"), "image/gif").status_code == 400
+    grande = b"0" * (5 * 1024 * 1024 + 10)
+    assert subir("g.png", grande, "image/png").status_code == 400
