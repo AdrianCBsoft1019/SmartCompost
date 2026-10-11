@@ -214,11 +214,15 @@ class _PilasScreenState extends State<PilasScreen> {
     if (_provider.pilas.isEmpty && !_admin) {
       return const EstadoVacio('No hay pilas que coincidan con los filtros.');
     }
-    return GridView.extent(
-      maxCrossAxisExtent: 320,
-      mainAxisSpacing: 16,
-      crossAxisSpacing: 16,
-      childAspectRatio: 1.05,
+    // Altura fija por tarjeta (mainAxisExtent): con childAspectRatio la altura
+    // dependia del ancho y la tarjeta del admin (menu de 3 puntos) se desbordaba.
+    return GridView(
+      gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
+        maxCrossAxisExtent: 320,
+        mainAxisSpacing: 16,
+        crossAxisSpacing: 16,
+        mainAxisExtent: 330,
+      ),
       children: [
         for (final p in _provider.pilas) _tarjeta(p),
         if (_admin) _tarjetaNueva(),
