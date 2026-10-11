@@ -1,7 +1,7 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Response
 from sqlalchemy.orm import Session
 
-from .. import analisis_service, models, schemas, security
+from .. import analisis_service, models, reporte_pdf, schemas, security
 from ..database import get_db
 
 router = APIRouter(prefix="/analisis", tags=["Analisis"])
@@ -48,3 +48,20 @@ def filtro_pilas(
     desde, _ = analisis_service.rango_periodo(_periodo_valido(periodo))
     por_pila, _ = analisis_service.conteo_fuera_de_limite(db, desde)
     return analisis_service.comparativa_pilas(db, desde, por_pila)
+
+
+@router.get("/reporte.pdf")
+def descargar_reporte(
+    periodo: str = "semana",
+    db: Session = Depends(get_db),
+    current_user: models.Usuario = Depends(security.get_current_user),
+):
+    """Boton 'Descargar PDF' de la Vista de Analisis."""
+    datos = analisis_service.resumen(db, _periodo_valido(periodo))
+    return Response(
+        content=reporte_pdf.generar_pdf(datos),
+        media_type="application/pdf",
+        headers={
+            "Content-Disposition": f'attachment; filename="analisis_{periodo}.pdf"'
+        },
+    )
