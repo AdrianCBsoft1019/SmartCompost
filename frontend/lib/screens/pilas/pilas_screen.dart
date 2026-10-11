@@ -282,7 +282,7 @@ class _PilasScreenState extends State<PilasScreen> {
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               style: const TextStyle(color: AppColors.accent, fontSize: 12.5)),
-          const Spacer(),
+          const SizedBox(height: 14),
           Row(children: [
             _dato(
                 'TEMPERATURA',
