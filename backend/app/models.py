@@ -2,7 +2,16 @@ import enum
 import uuid
 from datetime import datetime
 
-from sqlalchemy import Column, String, DateTime, Enum, ForeignKey, Float, Boolean
+from sqlalchemy import (
+    Boolean,
+    Column,
+    DateTime,
+    Enum,
+    Float,
+    ForeignKey,
+    Integer,
+    String,
+)
 from sqlalchemy.orm import relationship
 
 from .database import Base
@@ -48,6 +57,9 @@ class Pila(Base):
     latitud = Column(Float, nullable=True)
     longitud = Column(Float, nullable=True)
     estado = Column(String(30), default="normal")
+    # Ciclo de compostaje: de aqui se calculan la maduracion y la fase.
+    fecha_inicio = Column(DateTime, default=datetime.utcnow, nullable=False)
+    dias_ciclo = Column(Integer, default=90, nullable=False)
     responsable_id = Column(
         UUID(as_uuid=False), ForeignKey("usuarios.id"), nullable=True
     )
