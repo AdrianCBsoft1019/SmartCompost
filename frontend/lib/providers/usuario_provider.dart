@@ -1,3 +1,4 @@
+import 'dart:typed_data';
 import 'package:flutter/foundation.dart';
 import '../models/rol_usuario.dart';
 import '../models/usuario.dart';
@@ -66,6 +67,20 @@ class UsuarioProvider extends ChangeNotifier {
   Future<void> desactivar(String id) async {
     await _api.delete('/usuarios/$id');
     await cargar();
+  }
+
+  /// Sube una foto desde el dispositivo (la API la recorta a 256x256).
+  Future<void> subirMiFoto(Uint8List bytes, String nombre) async {
+    final data = await _api.subirArchivo('/usuarios/me/foto', bytes, nombre);
+    Session.instance.usuario = Usuario.fromJson(data as Map<String, dynamic>);
+    Session.instance.fotoCambiada();
+  }
+
+  Future<void> quitarMiFoto() async {
+    await _api.delete('/usuarios/me/foto');
+    final data = await _api.get('/usuarios/me');
+    Session.instance.usuario = Usuario.fromJson(data as Map<String, dynamic>);
+    Session.instance.fotoCambiada();
   }
 
   /// Edicion del propio perfil (clic en el logo de usuario).

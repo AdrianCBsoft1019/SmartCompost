@@ -6,6 +6,7 @@ class Usuario {
   final String correo;
   final RolUsuario rol;
   final bool activo;
+  final bool tieneFoto;
 
   const Usuario({
     required this.id,
@@ -13,6 +14,7 @@ class Usuario {
     required this.correo,
     required this.rol,
     required this.activo,
+    this.tieneFoto = false,
   });
 
   factory Usuario.fromJson(Map<String, dynamic> j) => Usuario(
@@ -21,6 +23,7 @@ class Usuario {
         correo: j['correo'] as String,
         rol: RolUsuario.values.firstWhere((r) => r.value == j['rol']),
         activo: j['activo'] as bool,
+        tieneFoto: (j['tiene_foto'] as bool?) ?? false,
       );
 
   /// El instructor es el "Administrador" del sistema.

@@ -121,6 +121,17 @@ class ApiService {
     return resp.bodyBytes;
   }
 
+  /// Sube un archivo (multipart/form-data) con el JWT. Devuelve el JSON.
+  Future<dynamic> subirArchivo(String path, Uint8List bytes, String nombre,
+      {String campo = 'archivo'}) async {
+    final token = await obtenerToken();
+    final peticion = http.MultipartRequest('POST', _uri(path))
+      ..headers.addAll({if (token != null) 'Authorization': 'Bearer $token'})
+      ..files.add(http.MultipartFile.fromBytes(campo, bytes, filename: nombre));
+    final resp = await http.Response.fromStream(await peticion.send());
+    return _procesar(resp);
+  }
+
   String _extraerError(http.Response resp) {
     try {
       final body = jsonDecode(utf8.decode(resp.bodyBytes));

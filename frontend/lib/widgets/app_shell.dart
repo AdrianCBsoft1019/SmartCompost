@@ -5,6 +5,7 @@ import '../screens/perfil/usuarios_screen.dart';
 import '../screens/pilas/pilas_screen.dart';
 import '../services/session.dart';
 import '../theme/app_theme.dart';
+import 'avatar_usuario.dart';
 
 class _Destino {
   final String titulo;
@@ -49,13 +50,9 @@ class _AppShellState extends State<AppShell> {
       child: InkWell(
         customBorder: const CircleBorder(),
         onTap: _abrirPerfil,
-        child: CircleAvatar(
-          radius: 18,
-          backgroundColor: AppColors.accentDark,
-          child: Text(u?.iniciales ?? '?',
-              style: const TextStyle(
-                  color: Colors.black, fontWeight: FontWeight.w800, fontSize: 13)),
-        ),
+        child: u == null
+            ? const CircleAvatar(radius: 18, child: Text('?'))
+            : AvatarUsuario(usuario: u, radius: 18),
       ),
     );
   }

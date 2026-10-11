@@ -4,6 +4,7 @@ import '../../models/usuario.dart';
 import '../../providers/usuario_provider.dart';
 import '../../services/session.dart';
 import '../../theme/app_theme.dart';
+import '../../widgets/avatar_usuario.dart';
 import '../../widgets/estado_chip.dart';
 import '../../widgets/panel_card.dart';
 
@@ -145,7 +146,11 @@ class _UsuariosScreenState extends State<UsuariosScreen> {
             rows: [
               for (final u in _provider.usuarios)
                 DataRow(cells: [
-                  DataCell(Text(u.id == yo ? '${u.nombreCompleto} (tú)' : u.nombreCompleto)),
+                  DataCell(Row(mainAxisSize: MainAxisSize.min, children: [
+                    AvatarUsuario(usuario: u, radius: 14),
+                    const SizedBox(width: 10),
+                    Text(u.id == yo ? '${u.nombreCompleto} (tú)' : u.nombreCompleto),
+                  ])),
                   DataCell(Text(u.correo)),
                   DataCell(Text(u.esAdmin ? 'Administrador' : 'Estudiante')),
                   DataCell(Text(u.activo ? 'Activo' : 'Inactivo',

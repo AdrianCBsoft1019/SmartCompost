@@ -15,4 +15,13 @@ class Session extends ChangeNotifier {
   }
 
   bool get esAdmin => _usuario?.esAdmin ?? false;
+
+  /// Sube cada vez que alguien cambia su foto; los avatares la usan para
+  /// saber que deben volver a pedir la imagen al servidor.
+  int fotoVersion = 0;
+
+  void fotoCambiada() {
+    fotoVersion++;
+    notifyListeners();
+  }
 }

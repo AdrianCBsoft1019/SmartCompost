@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import '../../providers/usuario_provider.dart';
 import '../../services/api_service.dart';
 import '../../services/session.dart';
 import '../../theme/app_theme.dart';
+import '../../widgets/avatar_usuario.dart';
 import '../../widgets/panel_card.dart';
 import '../login_screen.dart';
 
@@ -22,8 +24,11 @@ class _PerfilScreenState extends State<PerfilScreen> {
   late final TextEditingController _correo;
   final _actual = TextEditingController();
   final _nueva = TextEditingController();
+  final _picker = ImagePicker();
   bool _guardando = false;
+  bool _subiendoFoto = false;
   String? _error;
+  String? _errorFoto;
 
   @override
   void initState() {
@@ -67,6 +72,43 @@ class _PerfilScreenState extends State<PerfilScreen> {
     }
   }
 
+  /// Abre el selector de archivos del dispositivo y sube la imagen elegida.
+  Future<void> _cambiarFoto() async {
+    setState(() => _errorFoto = null);
+    try {
+      final archivo = await _picker.pickImage(source: ImageSource.gallery);
+      if (archivo == null) return; // el usuario cancelo
+      final bytes = await archivo.readAsBytes();
+      if (bytes.length > 5 * 1024 * 1024) {
+        setState(() => _errorFoto = 'La imagen supera el máximo de 5 MB');
+        return;
+      }
+      setState(() => _subiendoFoto = true);
+      await _provider.subirMiFoto(bytes, archivo.name);
+      if (!mounted) return;
+      ScaffoldMessenger.of(context)
+          .showSnackBar(const SnackBar(content: Text('Foto actualizada')));
+    } catch (e) {
+      if (mounted) setState(() => _errorFoto = e.toString());
+    } finally {
+      if (mounted) setState(() => _subiendoFoto = false);
+    }
+  }
+
+  Future<void> _quitarFoto() async {
+    setState(() {
+      _subiendoFoto = true;
+      _errorFoto = null;
+    });
+    try {
+      await _provider.quitarMiFoto();
+    } catch (e) {
+      if (mounted) setState(() => _errorFoto = e.toString());
+    } finally {
+      if (mounted) setState(() => _subiendoFoto = false);
+    }
+  }
+
   Future<void> _cerrarSesion() async {
     await ApiService().cerrarSesion();
     if (!mounted) return;
@@ -92,16 +134,8 @@ class _PerfilScreenState extends State<PerfilScreen> {
                 key: _formKey,
                 child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                   Row(children: [
-                    CircleAvatar(
-                      radius: 28,
-                      backgroundColor: AppColors.accentDark,
-                      child: Text(u.iniciales,
-                          style: const TextStyle(
-                              color: Colors.black,
-                              fontWeight: FontWeight.w800,
-                              fontSize: 18)),
-                    ),
-                    const SizedBox(width: 14),
+                    AvatarUsuario(usuario: u, radius: 36),
+                    const SizedBox(width: 16),
                     Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                       Text(u.nombreCompleto,
                           style: const TextStyle(
@@ -113,6 +147,35 @@ class _PerfilScreenState extends State<PerfilScreen> {
                           style: const TextStyle(color: AppColors.accent)),
                     ]),
                   ]),
+                  const SizedBox(height: 14),
+                  Wrap(spacing: 10, runSpacing: 8, children: [
+                    OutlinedButton.icon(
+                      onPressed: _subiendoFoto ? null : _cambiarFoto,
+                      icon: _subiendoFoto
+                          ? const SizedBox(
+                              width: 16,
+                              height: 16,
+                              child: CircularProgressIndicator(strokeWidth: 2))
+                          : const Icon(Icons.photo_camera_outlined, size: 18),
+                      label: const Text('Cambiar foto'),
+                    ),
+                    if (u.tieneFoto)
+                      TextButton(
+                        onPressed: _subiendoFoto ? null : _quitarFoto,
+                        child: const Text('Quitar foto'),
+                      ),
+                  ]),
+                  const Padding(
+                    padding: EdgeInsets.only(top: 6),
+                    child: Text('PNG, JPG o WEBP · máximo 5 MB',
+                        style: TextStyle(color: AppColors.textMuted, fontSize: 11.5)),
+                  ),
+                  if (_errorFoto != null)
+                    Padding(
+                      padding: const EdgeInsets.only(top: 6),
+                      child: Text(_errorFoto!,
+                          style: const TextStyle(color: Colors.redAccent)),
+                    ),
                   const SizedBox(height: 22),
                   TextFormField(
                     controller: _nombre,
