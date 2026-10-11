@@ -1,7 +1,15 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import (
+    APIRouter,
+    Depends,
+    File,
+    HTTPException,
+    Response,
+    UploadFile,
+    status,
+)
 from sqlalchemy.orm import Session
 
-from .. import models, schemas, security
+from .. import foto_service, models, schemas, security
 from ..database import get_db
 
 router = APIRouter(prefix="/usuarios", tags=["Usuarios"])
@@ -88,6 +96,65 @@ def editar_mi_perfil(
     db.commit()
     db.refresh(current_user)
     return current_user
+
+
+def _respuesta_foto(usuario: models.Usuario) -> Response:
+    if not usuario.tiene_foto or usuario.foto is None:
+        raise HTTPException(status_code=404, detail="El usuario no tiene foto")
+    return Response(
+        content=usuario.foto,
+        media_type=usuario.foto_tipo,
+        headers={"Cache-Control": "no-cache"},
+    )
+
+
+@router.post("/me/foto", response_model=schemas.UsuarioOut)
+async def subir_mi_foto(
+    archivo: UploadFile = File(...),
+    db: Session = Depends(get_db),
+    current_user: models.Usuario = Depends(security.get_current_user),
+):
+    """Cambia la foto de perfil propia (administrador o estudiante).
+
+    Recibe multipart/form-data con el campo `archivo` (PNG, JPG o WEBP).
+    """
+    datos = await archivo.read(foto_service.MAX_BYTES + 1)
+    try:
+        png = foto_service.procesar_imagen(datos)
+    except ValueError as error:
+        raise HTTPException(status_code=400, detail=str(error))
+    current_user.foto = png
+    current_user.foto_tipo = foto_service.TIPO_SALIDA
+    db.commit()
+    db.refresh(current_user)
+    return current_user
+
+
+@router.delete("/me/foto", response_model=schemas.UsuarioOut)
+def quitar_mi_foto(
+    db: Session = Depends(get_db),
+    current_user: models.Usuario = Depends(security.get_current_user),
+):
+    current_user.foto = None
+    current_user.foto_tipo = None
+    db.commit()
+    db.refresh(current_user)
+    return current_user
+
+
+@router.get("/me/foto")
+def ver_mi_foto(current_user: models.Usuario = Depends(security.get_current_user)):
+    return _respuesta_foto(current_user)
+
+
+@router.get("/{usuario_id}/foto")
+def ver_foto_usuario(
+    usuario_id: str,
+    db: Session = Depends(get_db),
+    current_user: models.Usuario = Depends(security.get_current_user),
+):
+    """Cualquier usuario autenticado puede ver la foto de otro (listas)."""
+    return _respuesta_foto(_buscar_usuario(db, usuario_id))
 
 
 @router.get("/{usuario_id}", response_model=schemas.UsuarioOut)

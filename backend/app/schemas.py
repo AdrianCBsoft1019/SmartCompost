@@ -24,6 +24,7 @@ class UsuarioOut(BaseModel):
     rol: RolUsuario
     activo: bool
     creado_en: datetime
+    tiene_foto: bool = False
 
     class Config:
         from_attributes = True

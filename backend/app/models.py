@@ -10,9 +10,10 @@ from sqlalchemy import (
     Float,
     ForeignKey,
     Integer,
+    LargeBinary,
     String,
 )
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import deferred, relationship
 
 from .database import Base
 
@@ -42,8 +43,16 @@ class Usuario(Base):
     rol = Column(Enum(RolUsuario), nullable=False, default=RolUsuario.aprendiz)
     activo = Column(Boolean, default=True)
     creado_en = Column(DateTime, default=datetime.utcnow)
+    # Foto de perfil (PNG 256x256). `deferred`: el binario solo se lee
+    # cuando se pide, para no cargarlo en cada listado de usuarios.
+    foto = deferred(Column(LargeBinary, nullable=True))
+    foto_tipo = Column(String(30), nullable=True)
 
     pilas = relationship("Pila", back_populates="responsable")
+
+    @property
+    def tiene_foto(self) -> bool:
+        return self.foto_tipo is not None
 
 
 class Pila(Base):
