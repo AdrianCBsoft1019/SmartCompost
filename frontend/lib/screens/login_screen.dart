@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/gestures.dart';
 import '../theme/app_theme.dart';
 import '../services/api_service.dart';
+import '../widgets/app_shell.dart';
 import 'register_screen.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -38,8 +39,9 @@ class _LoginScreenState extends State<LoginScreen> {
     try {
       await _api.login(correo: _correoCtrl.text.trim(), password: _passwordCtrl.text);
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Sesion iniciada correctamente')),
+      // Sesion iniciada: entra a la app (el rol decide que menus se ven).
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(builder: (_) => const AppShell()),
       );
     } catch (e) {
       setState(() => _error = e.toString());
