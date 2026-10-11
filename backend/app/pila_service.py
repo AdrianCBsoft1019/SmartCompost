@@ -8,6 +8,10 @@ import math
 from datetime import datetime
 from typing import Optional
 
+from sqlalchemy.orm import Session
+
+from . import models
+
 # Limites de seguridad. (minimo, maximo); None = sin limite en ese lado.
 LIMITES: dict[str, tuple[Optional[float], Optional[float]]] = {
     "temperatura": (None, 70.0),  # >70 C mata la microbiologia util
@@ -133,3 +137,35 @@ def estado_desde_semaforo(semaforo: str, madurez_pct: float) -> str:
     if madurez_pct >= 100:
         return "listo"
     return {"verde": "normal", "amarillo": "atencion", "rojo": "critico"}[semaforo]
+
+
+def ultima_lectura(db: Session, pila_id: str) -> Optional[models.Lectura]:
+    return (
+        db.query(models.Lectura)
+        .filter(models.Lectura.pila_id == pila_id)
+        .order_by(models.Lectura.creado_en.desc())
+        .first()
+    )
+
+
+def a_salida(pila: models.Pila, db: Session) -> dict:
+    """Convierte una Pila ORM en el dict de PilaOut (con campos calculados)."""
+    madurez = calcular_madurez(pila.fecha_inicio, pila.dias_ciclo)
+    lectura = ultima_lectura(db, pila.id)
+    return {
+        "id": pila.id,
+        "nombre": pila.nombre,
+        "ubicacion": pila.ubicacion,
+        "latitud": pila.latitud,
+        "longitud": pila.longitud,
+        "estado": pila.estado,
+        "responsable_id": pila.responsable_id,
+        "creado_en": pila.creado_en,
+        "fecha_inicio": pila.fecha_inicio,
+        "dias_ciclo": pila.dias_ciclo,
+        "fase": madurez["fase"],
+        "madurez_pct": madurez["madurez_pct"],
+        "dias_faltantes_fase": madurez["dias_faltantes_fase"],
+        "temperatura": lectura.temperatura if lectura else None,
+        "humedad": lectura.humedad if lectura else None,
+    }
