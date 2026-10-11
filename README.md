@@ -56,3 +56,43 @@ flutter run -d chrome --dart-define=API_BASE_URL=http://localhost:8000
 ```
 
 Desde ahí puedes crear una cuenta en la pantalla de Registro e iniciar sesión desde Login; el usuario debe quedar guardado en la tabla `usuarios` de MySQL.
+
+## 5. Modulo Pilas, Analisis y Perfiles (Nareth)
+
+### Datos de demostracion
+
+```bash
+docker compose exec backend python -m app.seed
+```
+
+Crea 2 usuarios, 4 pilas, sensores y 30 dias de lecturas:
+
+| Rol | Correo | Contrasena |
+|-----|--------|------------|
+| Administrador (instructor) | admin@smartcompost.com | Admin12345 |
+| Estudiante (aprendiz) | estudiante@smartcompost.com | Estudiante123 |
+
+> Si tu base MySQL ya existia, ejecuta antes `backend/migrations/001_pilas_ciclo.sql`
+> (o `docker compose down -v` para empezar de cero).
+
+### Endpoints nuevos
+
+| Metodo | Ruta | Rol |
+|--------|------|-----|
+| GET | `/pilas/?q=&fase=&ubicacion=&estado=` | todos |
+| POST / PUT / DELETE | `/pilas/`, `/pilas/{id}` | instructor |
+| GET | `/pilas/{id}/detalle` | todos |
+| GET / POST | `/pilas/{id}/lecturas` | todos |
+| GET | `/analisis/resumen?periodo=semana\|mes\|anio` | todos |
+| GET | `/analisis/sensores`, `/analisis/pilas` | todos |
+| GET | `/analisis/reporte.pdf?periodo=` | todos |
+| GET / PUT | `/usuarios/me` | todos |
+| GET / POST / PUT / DELETE | `/usuarios/`, `/usuarios/{id}` | instructor |
+
+Coleccion Postman lista para importar: `docs/SmartCompost_Nareth.postman_collection.json`.
+
+### Pruebas del backend
+
+```bash
+cd backend && pip install -r requirements.txt pytest httpx && python -m pytest -q
+```

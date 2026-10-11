@@ -12,12 +12,16 @@ DB_NAME = os.getenv("DB_NAME", "smartcompost")
 DB_USER = os.getenv("DB_USER", "root")
 DB_PASSWORD = os.getenv("DB_PASSWORD", "")
 
-DATABASE_URL = (
+# DATABASE_URL permite apuntar a otra base (las pruebas usan SQLite).
+DATABASE_URL = os.getenv("DATABASE_URL") or (
     f"mysql+pymysql://{DB_USER}:{DB_PASSWORD}"
     f"@{DB_HOST}:{DB_PORT}/{DB_NAME}?charset=utf8mb4"
 )
 
-engine = create_engine(DATABASE_URL, pool_pre_ping=True)
+_connect_args = (
+    {"check_same_thread": False} if DATABASE_URL.startswith("sqlite") else {}
+)
+engine = create_engine(DATABASE_URL, pool_pre_ping=True, connect_args=_connect_args)
 
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
