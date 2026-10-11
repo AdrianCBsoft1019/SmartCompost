@@ -255,8 +255,13 @@ class _PilasScreenState extends State<PilasScreen> {
     return InkWell(
       borderRadius: BorderRadius.circular(14),
       onTap: () => _abrirDetalle(p),
-      child: PanelCard(
+      child: Container(
         padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: AppColors.surface,
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(color: AppColors.border),
+        ),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Row(children: [
             EstadoChip(p.estado),
