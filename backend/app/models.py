@@ -69,6 +69,9 @@ class Pila(Base):
     sensores = relationship(
         "Sensor", back_populates="pila", cascade="all, delete-orphan"
     )
+    lecturas = relationship(
+        "Lectura", back_populates="pila", cascade="all, delete-orphan"
+    )
 
 
 class TipoSensor(str, enum.Enum):
@@ -91,3 +94,29 @@ class Sensor(Base):
     creado_en = Column(DateTime, default=datetime.utcnow)
 
     pila = relationship("Pila", back_populates="sensores")
+
+
+class Lectura(Base):
+    """Medicion de una pila (sensor fisico, simulacion Tinkercad o manual).
+
+    Es la fuente de datos de la gafica de 24 h, el semaforo y el analisis.
+    """
+
+    __tablename__ = "lecturas"
+
+    id = Column(UUID(as_uuid=False), primary_key=True, default=gen_uuid)
+    pila_id = Column(
+        UUID(as_uuid=False),
+        ForeignKey("pilas.id", ondelete="CASCADE"),
+        index=True,
+        nullable=False,
+    )
+    sensor_id = Column(UUID(as_uuid=False), ForeignKey("sensores.id"), nullable=True)
+    temperatura = Column(Float, nullable=False)
+    humedad = Column(Float, nullable=False)
+    co2_ppm = Column(Float, nullable=True)
+    ch4_ppm = Column(Float, nullable=True)
+    nh3_ppm = Column(Float, nullable=True)
+    creado_en = Column(DateTime, default=datetime.utcnow, index=True, nullable=False)
+
+    pila = relationship("Pila", back_populates="lecturas")
