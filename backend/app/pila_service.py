@@ -1,0 +1,135 @@
+"""Reglas de negocio de las pilas (maduracion, fases y semaforo).
+
+Se mantiene separado de los routers para poder probarlo sin base de datos
+y para que Alertas (Roderick) reutilice `evaluar_valores`.
+"""
+
+import math
+from datetime import datetime
+from typing import Optional
+
+# Limites de seguridad. (minimo, maximo); None = sin limite en ese lado.
+LIMITES: dict[str, tuple[Optional[float], Optional[float]]] = {
+    "temperatura": (None, 70.0),  # >70 C mata la microbiologia util
+    "humedad": (40.0, 65.0),  # % ideal para compostaje aerobio
+    "co2_ppm": (None, 1000.0),
+    "ch4_ppm": (None, 500.0),
+    "nh3_ppm": (None, 25.0),
+}
+
+NOMBRES = {
+    "temperatura": "Temperatura",
+    "humedad": "Humedad",
+    "co2_ppm": "CO2",
+    "ch4_ppm": "Metano (CH4)",
+    "nh3_ppm": "Amoniaco (NH3)",
+}
+
+# Margen para "amarillo": cerca del limite pero todavia sin superarlo.
+MARGEN_ADVERTENCIA = 0.10
+
+# Fases: (nombre, fraccion del ciclo en la que termina)
+FASES = [
+    ("mesofilica", 0.10),
+    ("termofilica", 0.40),
+    ("enfriamiento", 0.70),
+    ("maduracion", 1.00),
+]
+
+
+def dias_transcurridos(fecha_inicio: datetime, ahora: Optional[datetime] = None) -> int:
+    ahora = ahora or datetime.utcnow()
+    return max(0, (ahora - fecha_inicio).days)
+
+
+def calcular_madurez(
+    fecha_inicio: datetime, dias_ciclo: int, ahora: Optional[datetime] = None
+) -> dict:
+    """Porcentaje de maduracion, fase actual y dias para la siguiente fase."""
+    transcurridos = dias_transcurridos(fecha_inicio, ahora)
+    fraccion = min(1.0, transcurridos / dias_ciclo)
+
+    fase_actual, fin_fraccion = FASES[-1]
+    for nombre, fin in FASES:
+        if fraccion < fin:
+            fase_actual, fin_fraccion = nombre, fin
+            break
+
+    dias_faltantes = max(0, math.ceil(fin_fraccion * dias_ciclo - transcurridos))
+    return {
+        "madurez_pct": round(fraccion * 100, 1),
+        "fase": fase_actual,
+        "dias_faltantes_fase": dias_faltantes,
+        "dias_transcurridos": transcurridos,
+    }
+
+
+def _estado_variable(nombre: str, valor: float) -> str:
+    minimo, maximo = LIMITES[nombre]
+    if (maximo is not None and valor > maximo) or (
+        minimo is not None and valor < minimo
+    ):
+        return "rojo"
+    if maximo is not None and valor >= maximo * (1 - MARGEN_ADVERTENCIA):
+        return "amarillo"
+    if minimo is not None and valor <= minimo * (1 + MARGEN_ADVERTENCIA):
+        return "amarillo"
+    return "verde"
+
+
+def evaluar_valores(valores: dict[str, Optional[float]]) -> dict:
+    """Compara cada medicion con LIMITES y devuelve el semaforo global.
+
+    rojo     -> alguna variable fuera de limites  (indicador: inseguro)
+    amarillo -> alguna variable a menos de 10 % del limite (indicador: seguro)
+    verde    -> todo en rango                      (indicador: seguro)
+    """
+    semaforo = "verde"
+    violaciones: list[str] = []
+    for nombre, valor in valores.items():
+        if valor is None or nombre not in LIMITES:
+            continue
+        estado = _estado_variable(nombre, valor)
+        if estado == "rojo":
+            semaforo = "rojo"
+            minimo, maximo = LIMITES[nombre]
+            lado = "supera el maximo" if maximo and valor > maximo else "bajo el minimo"
+            limite = maximo if maximo and valor > maximo else minimo
+            violaciones.append(
+                f"{NOMBRES[nombre]} {lado} permitido ({valor:g} vs {limite:g})"
+            )
+        elif estado == "amarillo" and semaforo != "rojo":
+            semaforo = "amarillo"
+    return {
+        "semaforo": semaforo,
+        "indicador": "inseguro" if semaforo == "rojo" else "seguro",
+        "violaciones": violaciones,
+    }
+
+
+def evaluar_lectura(lectura) -> dict:
+    return evaluar_valores(
+        {
+            "temperatura": lectura.temperatura,
+            "humedad": lectura.humedad,
+            "co2_ppm": lectura.co2_ppm,
+            "ch4_ppm": lectura.ch4_ppm,
+            "nh3_ppm": lectura.nh3_ppm,
+        }
+    )
+
+
+def variables_fuera_de_limite(lectura) -> list[str]:
+    """Nombres de las variables en rojo (para estadisticas de alteracion)."""
+    fuera = []
+    for nombre in LIMITES:
+        valor = getattr(lectura, nombre, None)
+        if valor is not None and _estado_variable(nombre, valor) == "rojo":
+            fuera.append(nombre)
+    return fuera
+
+
+def estado_desde_semaforo(semaforo: str, madurez_pct: float) -> str:
+    if madurez_pct >= 100:
+        return "listo"
+    return {"verde": "normal", "amarillo": "atencion", "rojo": "critico"}[semaforo]
