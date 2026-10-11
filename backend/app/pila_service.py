@@ -5,7 +5,8 @@ y para que Alertas (Roderick) reutilice `evaluar_valores`.
 """
 
 import math
-from datetime import datetime
+from collections import defaultdict
+from datetime import datetime, timedelta
 from typing import Optional
 
 from sqlalchemy.orm import Session
@@ -169,3 +170,30 @@ def a_salida(pila: models.Pila, db: Session) -> dict:
         "temperatura": lectura.temperatura if lectura else None,
         "humedad": lectura.humedad if lectura else None,
     }
+
+
+def serie_por_hora(db: Session, pila_id: str, horas: int = 24) -> list[dict]:
+    """Promedio de temperatura y humedad por hora para la grafica de 24 h."""
+    desde = datetime.utcnow() - timedelta(hours=horas)
+    lecturas = (
+        db.query(models.Lectura)
+        .filter(models.Lectura.pila_id == pila_id, models.Lectura.creado_en >= desde)
+        .order_by(models.Lectura.creado_en)
+        .all()
+    )
+    cubetas: dict[datetime, list[models.Lectura]] = defaultdict(list)
+    for lectura in lecturas:
+        cubetas[lectura.creado_en.replace(minute=0, second=0, microsecond=0)].append(
+            lectura
+        )
+    serie = []
+    for hora in sorted(cubetas):
+        grupo = cubetas[hora]
+        serie.append(
+            {
+                "hora": hora,
+                "temperatura": round(sum(x.temperatura for x in grupo) / len(grupo), 1),
+                "humedad": round(sum(x.humedad for x in grupo) / len(grupo), 1),
+            }
+        )
+    return serie

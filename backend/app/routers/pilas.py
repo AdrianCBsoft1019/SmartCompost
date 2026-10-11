@@ -1,3 +1,4 @@
+from datetime import datetime, timedelta
 from typing import Optional
 
 from fastapi import APIRouter, Depends, HTTPException, status
@@ -115,6 +116,50 @@ def obtener_pila(
     current_user: models.Usuario = Depends(security.get_current_user),
 ):
     return pila_service.a_salida(_buscar_pila(db, pila_id), db)
+
+
+@router.get("/{pila_id}/detalle", response_model=schemas.PilaDetalleOut)
+def detalle_pila(
+    pila_id: str,
+    db: Session = Depends(get_db),
+    current_user: models.Usuario = Depends(security.get_current_user),
+):
+    """Todo lo que necesita la vista de detalle en una sola peticion."""
+    pila = _buscar_pila(db, pila_id)
+    lectura = pila_service.ultima_lectura(db, pila_id)
+    if lectura:
+        evaluacion = pila_service.evaluar_lectura(lectura)
+    else:
+        evaluacion = {"semaforo": "verde", "indicador": "seguro", "violaciones": []}
+    madurez = pila_service.calcular_madurez(pila.fecha_inicio, pila.dias_ciclo)
+    return {
+        "pila": pila_service.a_salida(pila, db),
+        "evaluacion": evaluacion,
+        "gases": {
+            "co2_ppm": lectura.co2_ppm if lectura else None,
+            "ch4_ppm": lectura.ch4_ppm if lectura else None,
+            "nh3_ppm": lectura.nh3_ppm if lectura else None,
+        },
+        "serie_24h": pila_service.serie_por_hora(db, pila_id, 24),
+        "dias_transcurridos": madurez["dias_transcurridos"],
+    }
+
+
+@router.get("/{pila_id}/lecturas", response_model=list[schemas.LecturaOut])
+def listar_lecturas(
+    pila_id: str,
+    horas: int = 24,
+    db: Session = Depends(get_db),
+    current_user: models.Usuario = Depends(security.get_current_user),
+):
+    _buscar_pila(db, pila_id)
+    desde = datetime.utcnow() - timedelta(hours=max(1, min(horas, 24 * 365)))
+    return (
+        db.query(models.Lectura)
+        .filter(models.Lectura.pila_id == pila_id, models.Lectura.creado_en >= desde)
+        .order_by(models.Lectura.creado_en)
+        .all()
+    )
 
 
 @router.put("/{pila_id}", response_model=schemas.PilaOut)
