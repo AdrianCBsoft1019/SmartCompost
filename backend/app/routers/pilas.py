@@ -67,6 +67,47 @@ def listar_pilas(
     return salida
 
 
+@router.post(
+    "/{pila_id}/lecturas",
+    response_model=schemas.LecturaEvaluadaOut,
+    status_code=status.HTTP_201_CREATED,
+)
+def registrar_lectura(
+    pila_id: str,
+    datos: schemas.LecturaCreate,
+    db: Session = Depends(get_db),
+    current_user: models.Usuario = Depends(security.get_current_user),
+):
+    """Flujo end-to-end: la lectura se guarda, se evalua contra los limites
+    y el estado de la pila se actualiza (normal / atencion / critico / listo).
+    """
+    pila = _buscar_pila(db, pila_id)
+    if datos.sensor_id:
+        sensor = (
+            db.query(models.Sensor)
+            .filter(
+                models.Sensor.id == datos.sensor_id, models.Sensor.pila_id == pila_id
+            )
+            .first()
+        )
+        if not sensor:
+            raise HTTPException(
+                status_code=404, detail="El sensor no pertenece a esta pila"
+            )
+
+    lectura = models.Lectura(pila_id=pila_id, **datos.model_dump())
+    db.add(lectura)
+
+    evaluacion = pila_service.evaluar_lectura(lectura)
+    madurez = pila_service.calcular_madurez(pila.fecha_inicio, pila.dias_ciclo)
+    pila.estado = pila_service.estado_desde_semaforo(
+        evaluacion["semaforo"], madurez["madurez_pct"]
+    )
+    db.commit()
+    db.refresh(lectura)
+    return {"lectura": lectura, "evaluacion": evaluacion}
+
+
 @router.get("/{pila_id}", response_model=schemas.PilaOut)
 def obtener_pila(
     pila_id: str,
