@@ -96,3 +96,14 @@ Coleccion Postman lista para importar: `docs/SmartCompost_Nareth.postman_collect
 ```bash
 cd backend && pip install -r requirements.txt pytest httpx && python -m pytest -q
 ```
+
+### Foto de perfil
+
+Cada usuario (administrador o estudiante) puede cambiar su foto desde **Mi perfil**
+(clic en el avatar): *Cambiar foto* abre el selector de archivos del dispositivo.
+
+- La API acepta PNG, JPG o WEBP de hasta 5 MB, la valida, la recorta a cuadrado y
+  la reduce a 256x256 (se guarda como PNG en la base de datos).
+- Endpoints: `POST/DELETE/GET /usuarios/me/foto` y `GET /usuarios/{id}/foto`.
+- Bases ya creadas: ejecutar una vez `backend/migrations/002_usuario_foto.sql`.
+- Frontend: despues de actualizar, correr `flutter pub get` (nueva dependencia `image_picker`).
