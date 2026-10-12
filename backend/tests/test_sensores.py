@@ -98,3 +98,23 @@ def test_filtros_de_listado(client, estudiante):
     assert len(de_pila) == 3
     por_codigo = client.get("/sensores/?q=hum", headers=estudiante).json()
     assert len(por_codigo) == 4
+
+
+def test_eliminar_sensor_conserva_las_lecturas(client, admin):
+    from app import models
+    from app.database import SessionLocal
+
+    pila = _primera_pila(client, admin)
+    sensor = client.post("/sensores/", json=_nuevo(pila["id"]), headers=admin).json()
+    with SessionLocal() as db:
+        lectura = models.Lectura(
+            pila_id=pila["id"], sensor_id=sensor["id"], temperatura=50, humedad=50
+        )
+        db.add(lectura)
+        db.commit()
+        lectura_id = lectura.id
+
+    assert client.delete(f"/sensores/{sensor['id']}", headers=admin).status_code == 204
+    with SessionLocal() as db:
+        guardada = db.get(models.Lectura, lectura_id)
+        assert guardada is not None and guardada.sensor_id is None

@@ -1,5 +1,3 @@
-"""Alertas por limites superados: listado, filtros, resumen y permisos."""
-
 from .test_api import _primera_pila
 
 
@@ -92,3 +90,29 @@ def test_resumen_es_consistente(client, admin):
     # un periodo mas largo nunca tiene menos alertas
     anio = client.get("/alertas/resumen?periodo=anio", headers=admin).json()
     assert anio["total_alertas"] >= total
+
+
+def test_pdf_de_alertas(client, admin, estudiante):
+    pila = _primera_pila(client, admin)
+    _lectura(client, admin, pila["id"], temperatura=90)
+    for headers in (admin, estudiante):
+        r = client.get("/alertas/reporte.pdf?periodo=mes", headers=headers)
+        assert r.status_code == 200 and r.content.startswith(b"%PDF")
+        assert r.headers["content-type"] == "application/pdf"
+        assert "alertas_mes.pdf" in r.headers["content-disposition"]
+    assert (
+        client.get("/alertas/reporte.pdf?periodo=x", headers=admin).status_code == 400
+    )
+    assert client.get("/alertas/reporte.pdf").status_code == 401
+
+
+def test_pdf_sin_alertas_no_falla(client, admin):
+    # Pilas sin lecturas fuera de limite en un sistema recien sembrado.
+    from app import models
+    from app.database import SessionLocal
+
+    with SessionLocal() as db:
+        db.query(models.Lectura).delete()
+        db.commit()
+    r = client.get("/alertas/reporte.pdf", headers=admin)
+    assert r.status_code == 200 and r.content.startswith(b"%PDF")

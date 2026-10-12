@@ -136,6 +136,11 @@ def eliminar_sensor(
     current_user: models.Usuario = Depends(solo_instructor),
 ):
     sensor = _buscar_sensor(db, sensor_id)
+    # Las lecturas son historico de la pila: se conservan y solo pierden la
+    # referencia al sensor (en PostgreSQL la FK bloquearia el borrado).
+    db.query(models.Lectura).filter(models.Lectura.sensor_id == sensor.id).update(
+        {models.Lectura.sensor_id: None}
+    )
     db.delete(sensor)
     db.commit()
     return None
