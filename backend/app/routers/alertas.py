@@ -3,7 +3,14 @@ from typing import Optional
 from fastapi import APIRouter, Depends, HTTPException, Query, Response
 from sqlalchemy.orm import Session
 
-from .. import ( alertas_service, analisis_service, models, pila_service, reporte_alertas_pdf, security,)
+from .. import (
+    alertas_service,
+    analisis_service,
+    models,
+    pila_service,
+    reporte_alertas_pdf,
+    security,
+)
 from ..database import get_db
 from ..schemas_alertas import AlertaOut, AlertasResumenOut
 
