@@ -169,11 +169,13 @@ class SensorCreate(BaseModel):
     tipo: TipoSensor
     codigo_dispositivo: str = Field(min_length=3, max_length=60)
     pila_id: str
+    activo: bool = True
 
 
 class SensorUpdate(BaseModel):
     tipo: Optional[TipoSensor] = None
-    codigo_dispositivo: Optional[str] = None
+    codigo_dispositivo: Optional[str] = Field(default=None, min_length=3, max_length=60)
+    pila_id: Optional[str] = None
     activo: Optional[bool] = None
 
 
@@ -184,6 +186,8 @@ class SensorOut(BaseModel):
     pila_id: str
     activo: bool
     creado_en: datetime
+    pila_nombre: Optional[str]
+    ubicacion: Optional[str]
 
     class Config:
         from_attributes = True
