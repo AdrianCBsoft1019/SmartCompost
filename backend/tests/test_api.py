@@ -151,3 +151,17 @@ def test_foto_de_perfil_rechaza_archivos_invalidos(client, admin):
     assert subir("a.gif", _imagen("GIF"), "image/gif").status_code == 400
     grande = b"0" * (5 * 1024 * 1024 + 10)
     assert subir("g.png", grande, "image/png").status_code == 400
+
+
+def test_registro_publico_nunca_crea_instructor(client):
+    r = client.post(
+        "/auth/register",
+        json={
+            "nombre_completo": "Intruso Prueba",
+            "correo": "intruso@correo.com",
+            "password": "Intruso12345",
+            "rol": "instructor",
+        },
+    )
+    assert r.status_code == 201
+    assert r.json()["rol"] == "aprendiz"

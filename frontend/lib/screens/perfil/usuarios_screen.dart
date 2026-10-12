@@ -266,7 +266,7 @@ class _UsuarioDialogState extends State<_UsuarioDialog> {
               ),
               const SizedBox(height: 14),
               DropdownButtonFormField<RolUsuario>(
-                value: _rol,
+                initialValue: _rol,
                 decoration: const InputDecoration(labelText: 'Rol'),
                 items: const [
                   DropdownMenuItem(
@@ -282,7 +282,7 @@ class _UsuarioDialogState extends State<_UsuarioDialog> {
                   contentPadding: EdgeInsets.zero,
                   title: const Text('Perfil activo'),
                   value: _activo,
-                  activeColor: AppColors.accent,
+                  activeThumbColor: Colors.green,
                   onChanged: (v) => setState(() => _activo = v),
                 ),
             ]),

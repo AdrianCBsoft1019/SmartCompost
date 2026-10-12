@@ -5,6 +5,9 @@ import '../screens/perfil/perfil_screen.dart';
 import '../screens/perfil/usuarios_screen.dart';
 import '../screens/pilas/pilas_screen.dart';
 import '../screens/sensores/sensores_screen.dart';
+import '../models/usuario.dart';
+import '../screens/login_screen.dart';
+import '../services/api_service.dart';
 import '../services/session.dart';
 import '../theme/app_theme.dart';
 import 'avatar_usuario.dart';
@@ -30,6 +33,30 @@ class AppShell extends StatefulWidget {
 
 class _AppShellState extends State<AppShell> {
   int _indice = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _sincronizarSesion();
+  }
+
+  /// El rol que manda es el del servidor: se vuelve a leer de /auth/me para
+  /// que el menu y los permisos reales del backend nunca se desincronicen.
+  Future<void> _sincronizarSesion() async {
+    try {
+      final data = await ApiService().get('/auth/me');
+      Session.instance.usuario =
+          Usuario.fromJson(data as Map<String, dynamic>);
+      if (mounted) setState(() {});
+    } catch (_) {
+      // Token invalido o expirado: ApiService ya limpio la sesion.
+      if (mounted && Session.instance.usuario == null) {
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(builder: (_) => const LoginScreen()),
+        );
+      }
+    }
+  }
 
   static final List<_Destino> _todos = [
     _Destino('Pilas', Icons.eco_outlined, () => const PilasScreen()),
@@ -103,7 +130,7 @@ class _AppShellState extends State<AppShell> {
                                 : AppColors.textSecondary,
                             fontWeight: FontWeight.w600)),
                     selected: i == _indice,
-                    selectedTileColor: AppColors.accent.withOpacity(0.08),
+                    selectedTileColor: AppColors.accent.withValues(alpha: 0.5),
                     onTap: () => setState(() => _indice = i),
                   ),
                 const Spacer(),

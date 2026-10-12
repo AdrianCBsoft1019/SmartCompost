@@ -278,7 +278,7 @@ class _AlertasScreenState extends State<AlertasScreen> {
                     barWidth: 2.5,
                     dotData: FlDotData(show: d.length <= 14),
                     belowBarData: BarAreaData(
-                        show: true, color: EstadoColores.rojo.withOpacity(0.12)),
+                        show: true, color: EstadoColores.rojo.withValues(alpha: 0.5)),
                   ),
                 ],
               )),

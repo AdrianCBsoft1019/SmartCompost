@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/gestures.dart';
 import '../theme/app_theme.dart';
 import '../services/api_service.dart';
-import '../models/rol_usuario.dart';
 import 'login_screen.dart';
 
 class RegisterScreen extends StatefulWidget {
@@ -19,7 +18,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final _passwordCtrl = TextEditingController();
   final _api = ApiService();
 
-  RolUsuario _rol = RolUsuario.aprendiz;
   bool _obscure = true;
   bool _aceptaTerminos = false;
   bool _cargando = false;
@@ -48,7 +46,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
         nombreCompleto: _nombreCtrl.text.trim(),
         correo: _correoCtrl.text.trim(),
         password: _passwordCtrl.text,
-        rol: _rol.value,
       );
       if (!mounted) return;
       Navigator.of(context).pushReplacement(
@@ -168,21 +165,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 prefixIcon: Icon(Icons.person_outline, color: AppColors.textMuted, size: 20),
               ),
               validator: (v) => (v == null || v.trim().length < 3) ? 'Ingresa tu nombre completo' : null,
-            ),
-            const SizedBox(height: 16),
-
-            const _FieldLabel('Rol'),
-            DropdownButtonFormField<RolUsuario>(
-              value: _rol,
-              dropdownColor: AppColors.surfaceInput,
-              style: const TextStyle(color: AppColors.textPrimary),
-              decoration: const InputDecoration(
-                prefixIcon: Icon(Icons.badge_outlined, color: AppColors.textMuted, size: 20),
-              ),
-              items: RolUsuario.values
-                  .map((r) => DropdownMenuItem(value: r, child: Text(r.label)))
-                  .toList(),
-              onChanged: (v) => setState(() => _rol = v ?? RolUsuario.aprendiz),
             ),
             const SizedBox(height: 16),
 

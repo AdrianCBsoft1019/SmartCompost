@@ -34,7 +34,9 @@ def registrar_usuario(datos: schemas.UsuarioRegistro, db: Session = Depends(get_
         nombre_completo=datos.nombre_completo,
         correo=datos.correo,
         password_hash=security.hash_password(datos.password),
-        rol=datos.rol,
+        # El registro publico SIEMPRE crea aprendices. Un instructor solo
+        # lo crea otro instructor desde Usuarios (POST /usuarios/).
+        rol=models.RolUsuario.aprendiz,
     )
     db.add(nuevo_usuario)
     db.commit()

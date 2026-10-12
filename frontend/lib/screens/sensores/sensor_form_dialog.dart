@@ -95,7 +95,7 @@ class _SensorFormDialogState extends State<_SensorFormDialog> {
                       ),
                       const SizedBox(height: 14),
                       DropdownButtonFormField<String>(
-                        value: _tipo,
+                        initialValue: _tipo,
                         decoration:
                             const InputDecoration(labelText: 'Tipo de sensor'),
                         dropdownColor: AppColors.surfaceInput,
@@ -107,7 +107,7 @@ class _SensorFormDialogState extends State<_SensorFormDialog> {
                       ),
                       const SizedBox(height: 14),
                       DropdownButtonFormField<String>(
-                        value: _pilaId,
+                        initialValue : _pilaId,
                         isExpanded: true,
                         decoration:
                             const InputDecoration(labelText: 'Pila asignada'),
@@ -130,7 +130,7 @@ class _SensorFormDialogState extends State<_SensorFormDialog> {
                         contentPadding: EdgeInsets.zero,
                         title: const Text('Sensor activo'),
                         value: _activo,
-                        activeColor: AppColors.accent,
+                        activeThumbColor: Colors.green,
                         onChanged: (v) => setState(() => _activo = v),
                       ),
                     ],

@@ -340,7 +340,7 @@ class _SensoresScreenState extends State<SensoresScreen> {
           Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: AppColors.accent.withOpacity(0.1),
+              color: AppColors.accent.withValues(alpha: 0.5),
               borderRadius: BorderRadius.circular(10),
             ),
             child: Icon(_icono(s.tipo), color: AppColors.accent, size: 22),

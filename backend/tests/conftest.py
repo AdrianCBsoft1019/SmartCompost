@@ -1,7 +1,8 @@
 import os
+import tempfile
 
-os.environ["DATABASE_URL"] = "sqlite:////tmp/smartcompost_test.db"
-
+_DB_PRUEBAS = os.path.join(tempfile.gettempdir(), "smartcompost_test.db")
+os.environ["DATABASE_URL"] = "sqlite:///" + _DB_PRUEBAS.replace("\\", "/")
 import pytest  # noqa: E402
 from fastapi.testclient import TestClient  # noqa: E402
 
