@@ -3,6 +3,7 @@ import '../screens/analisis/analisis_screen.dart';
 import '../screens/perfil/perfil_screen.dart';
 import '../screens/perfil/usuarios_screen.dart';
 import '../screens/pilas/pilas_screen.dart';
+import '../screens/sensores/sensores_screen.dart';
 import '../services/session.dart';
 import '../theme/app_theme.dart';
 import 'avatar_usuario.dart';
@@ -32,6 +33,7 @@ class _AppShellState extends State<AppShell> {
   static final List<_Destino> _todos = [
     _Destino('Pilas', Icons.eco_outlined, () => const PilasScreen()),
     _Destino('Análisis', Icons.bar_chart_rounded, () => const AnalisisScreen()),
+    _Destino('Sensores', Icons.sensors, () => const SensoresScreen()),
     _Destino('Usuarios', Icons.people_outline, () => const UsuariosScreen(),
         soloAdmin: true),
   ];
