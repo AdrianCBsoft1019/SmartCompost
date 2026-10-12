@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../screens/alertas/alertas_screen.dart';
 import '../screens/analisis/analisis_screen.dart';
 import '../screens/perfil/perfil_screen.dart';
 import '../screens/perfil/usuarios_screen.dart';
@@ -33,6 +34,8 @@ class _AppShellState extends State<AppShell> {
   static final List<_Destino> _todos = [
     _Destino('Pilas', Icons.eco_outlined, () => const PilasScreen()),
     _Destino('Análisis', Icons.bar_chart_rounded, () => const AnalisisScreen()),
+    _Destino('Alertas', Icons.notifications_active_outlined,
+        () => const AlertasScreen()),
     _Destino('Sensores', Icons.sensors, () => const SensoresScreen()),
     _Destino('Usuarios', Icons.people_outline, () => const UsuariosScreen(),
         soloAdmin: true),
