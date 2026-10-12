@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../screens/alertas/alertas_screen.dart';
 import '../screens/analisis/analisis_screen.dart';
+import '../screens/dashboard/dashboard_screen.dart';
 import '../screens/perfil/perfil_screen.dart';
 import '../screens/perfil/usuarios_screen.dart';
 import '../screens/pilas/pilas_screen.dart';
@@ -20,10 +21,7 @@ class _Destino {
   const _Destino(this.titulo, this.icono, this.pantalla, {this.soloAdmin = false});
 }
 
-/// Marco de la app autenticada: menu lateral + avatar de usuario.
-///
-/// Para agregar una pantalla de otro modulo (Dashboard, Alertas, Sensores,
-/// Historial) basta con anadir un `_Destino` a la lista de abajo.
+
 class AppShell extends StatefulWidget {
   const AppShell({super.key});
 
@@ -40,8 +38,7 @@ class _AppShellState extends State<AppShell> {
     _sincronizarSesion();
   }
 
-  /// El rol que manda es el del servidor: se vuelve a leer de /auth/me para
-  /// que el menu y los permisos reales del backend nunca se desincronicen.
+
   Future<void> _sincronizarSesion() async {
     try {
       final data = await ApiService().get('/auth/me');
@@ -59,6 +56,7 @@ class _AppShellState extends State<AppShell> {
   }
 
   static final List<_Destino> _todos = [
+    _Destino('Dashboard', Icons.dashboard_outlined, () => const DashboardScreen()),
     _Destino('Pilas', Icons.eco_outlined, () => const PilasScreen()),
     _Destino('Análisis', Icons.bar_chart_rounded, () => const AnalisisScreen()),
     _Destino('Alertas', Icons.notifications_active_outlined,
