@@ -107,3 +107,51 @@ Cada usuario (administrador o estudiante) puede cambiar su foto desde **Mi perfi
 - Endpoints: `POST/DELETE/GET /usuarios/me/foto` y `GET /usuarios/{id}/foto`.
 - Bases ya creadas: ejecutar una vez `backend/migrations/002_usuario_foto.sql`.
 - Frontend: despues de actualizar, correr `flutter pub get` (nueva dependencia `image_picker`).
+
+## 6. Modulo Sensores y Alertas
+
+Documentacion detallada (reglas, limites y ejemplos): [`docs/sensores-y-alertas.md`](docs/sensores-y-alertas.md).
+
+### Sensores
+
+| Metodo | Ruta | Rol |
+|--------|------|-----|
+| GET | `/sensores/?pila_id=&tipo=&activo=&q=` | todos |
+| GET | `/sensores/{id}` | todos |
+| POST / PUT / DELETE | `/sensores/`, `/sensores/{id}` | instructor |
+
+- Al crear un sensor la pila debe existir y el `codigo_dispositivo` debe ser unico (3 a 60 caracteres).
+- Al eliminar un sensor sus lecturas **se conservan** (`sensor_id` queda en vacio).
+- Las respuestas incluyen `pila_nombre` y `ubicacion` de la pila del sensor.
+
+### Alertas
+
+Una alerta aparece cuando una lectura supera los limites de una variable (temperatura, humedad, CO2, CH4 o NH3). Es de solo lectura para instructor y estudiante.
+
+| Metodo | Ruta | Rol |
+|--------|------|-----|
+| GET | `/alertas/?periodo=&pila_id=&variable=&solo_activas=&limite=` | todos |
+| GET | `/alertas/resumen?periodo=semana\|mes\|anio` | todos |
+| GET | `/alertas/reporte.pdf?periodo=semana\|mes\|anio` | todos |
+
+### Pantallas (Flutter)
+
+- **Sensores**: listado con filtros; el administrador crea, edita, desactiva y elimina, el estudiante solo consulta.
+- **Alertas**: selector de periodo, tarjetas de resumen, graficas (por dia, variable, pila y sensor), historial con filtros y boton **Descargar PDF**. Es igual para administrador y estudiante.
+
+Para probar los endpoints sin Postman usa Swagger en `http://localhost:8000/docs`: inicia sesion en `/auth/login`, pulsa **Authorize** con el token y prueba `/sensores` y `/alertas`.
+
+## 7. Pruebas y calidad de codigo
+
+Desde `backend/`:
+
+```bash
+pip install -r requirements.txt pytest httpx black flake8
+python -m pytest -q      # pruebas (usan SQLite temporal, no necesitan MySQL)
+black --check app        # formato
+flake8 app               # estilo (max-line-length = 88)
+```
+
+Si Black marca archivos, corrigelos con `black app` y sube solo tus archivos.
+
+El workflow `.github/workflows/ci.yml` corre estos mismos tres pasos en cada push y pull request hacia `main`.
