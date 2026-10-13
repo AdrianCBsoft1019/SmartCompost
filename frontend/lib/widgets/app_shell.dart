@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../screens/alertas/alertas_screen.dart';
 import '../screens/analisis/analisis_screen.dart';
 import '../screens/dashboard/dashboard_screen.dart';
+import '../screens/intervenciones/intervenciones_screen.dart'; // <--- Importación añadida
 import '../screens/perfil/perfil_screen.dart';
 import '../screens/perfil/usuarios_screen.dart';
 import '../screens/pilas/pilas_screen.dart';
@@ -59,6 +60,7 @@ class _AppShellState extends State<AppShell> {
     _Destino('Dashboard', Icons.dashboard_outlined, () => const DashboardScreen()),
     _Destino('Pilas', Icons.eco_outlined, () => const PilasScreen()),
     _Destino('Análisis', Icons.bar_chart_rounded, () => const AnalisisScreen()),
+    _Destino('Intervenciones', Icons.assignment_outlined, () => const IntervencionesScreen()), // <--- Añadido aquí
     _Destino('Alertas', Icons.notifications_active_outlined,
         () => const AlertasScreen()),
     _Destino('Sensores', Icons.sensors, () => const SensoresScreen()),
