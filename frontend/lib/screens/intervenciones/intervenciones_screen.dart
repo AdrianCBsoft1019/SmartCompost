@@ -57,10 +57,6 @@ class _IntervencionesScreenState extends State<IntervencionesScreen> {
     super.dispose();
   }
 
-  // ---------------------------------------------------------------------------
-  // DATOS DE LAS INTERVENCIONES
-  // ---------------------------------------------------------------------------
-
   List<IntervencionItem> _obtenerIntervencionesReales(
     List<Pila> pilasReales,
   ) {
@@ -102,10 +98,6 @@ class _IntervencionesScreenState extends State<IntervencionesScreen> {
       );
     });
   }
-
-  // ---------------------------------------------------------------------------
-  // UTILIDADES DEL REPORTE PDF
-  // ---------------------------------------------------------------------------
 
   pdf_lib.PdfColor _colorPdf(int hex) {
     return pdf_lib.PdfColor(
@@ -260,10 +252,6 @@ class _IntervencionesScreenState extends State<IntervencionesScreen> {
       ],
     );
   }
-
-  // ---------------------------------------------------------------------------
-  // GENERACIÓN Y DESCARGA DEL REPORTE PDF
-  // ---------------------------------------------------------------------------
 
   Future<void> _descargarPdf(
     List<IntervencionItem> listaFiltrada,
@@ -668,10 +656,6 @@ class _IntervencionesScreenState extends State<IntervencionesScreen> {
     }
   }
 
-  // ---------------------------------------------------------------------------
-  // INTERFAZ
-  // ---------------------------------------------------------------------------
-
   @override
   Widget build(BuildContext context) {
     return ListenableBuilder(
@@ -739,10 +723,6 @@ class _IntervencionesScreenState extends State<IntervencionesScreen> {
               children: [
                 const SizedBox(height: 10),
 
-                // -------------------------------------------------------------
-                // BOTÓN PDF VISIBLE EN LA PARTE SUPERIOR DE LA VISTA.
-                // Está dentro del body y antes de todos los filtros.
-                // -------------------------------------------------------------
                 SizedBox(
                   width: double.infinity,
                   child: Align(
@@ -916,9 +896,6 @@ class _IntervencionesScreenState extends State<IntervencionesScreen> {
     );
   }
 
-  // ---------------------------------------------------------------------------
-  // FILTROS ORIGINALES
-  // ---------------------------------------------------------------------------
 
   Widget _chip(
     String texto,
