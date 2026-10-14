@@ -1,3 +1,4 @@
+
 name: smartcompost
 
 description: "SmartCompost - App de monitoreo de compostaje (Centro de Biotecnologia Agropecuaria, SENA Mosquera)"
@@ -18,12 +19,15 @@ dependencies:
   flutter_secure_storage: ^9.2.2
   fl_chart: ^0.69.0
   image_picker: ^1.1.2
+
+  # Generación y descarga de reportes PDF
   pdf: ^3.10.4
   printing: ^5.13.1
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
+
   flutter_lints: ^4.0.0
 
 flutter:
