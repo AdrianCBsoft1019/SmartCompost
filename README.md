@@ -155,3 +155,115 @@ flake8 app               # estilo (max-line-length = 88)
 Si Black marca archivos, corrigelos con `black app` y sube solo tus archivos.
 
 El workflow `.github/workflows/ci.yml` corre estos mismos tres pasos en cada push y pull request hacia `main`.
+
+## 8. Dashboard, Historial e Integración Final 
+
+### Dashboard Principal (Administrador)
+
+El dashboard principal permite al administrador consultar el estado general del sistema Smart Compost y visualizar información importante sobre las pilas de compostaje y los sensores registrados.
+
+**Funcionalidades principales:**
+
+- Visualización de gráficas con las tendencias de temperatura y gases de las pilas de compostaje.
+- Panel lateral con un resumen del estado de las pilas y un botón **"Ver todas"** para consultar el listado completo.
+- Tabla con información de los sensores activos y sus últimas lecturas disponibles.
+- Integración con la API para consultar los datos registrados en el sistema.
+- Organización de la información para facilitar el seguimiento del proceso de compostaje.
+
+### Historial de Acciones e Intervenciones
+
+El módulo de historial de acciones e intervenciones permite consultar y organizar las actividades realizadas durante el seguimiento de las pilas de compostaje.
+
+**Funcionalidades contempladas:**
+
+- Consulta del historial de acciones e intervenciones asociadas a las pilas.
+- Visualización de información como la pila relacionada, el técnico responsable, la fecha, el tipo de acción y su estado.
+- Filtros para facilitar la búsqueda por técnico, fecha y estado.
+- Identificación visual de los estados de las intervenciones.
+- Generación y descarga de reportes en formato PDF.
+
+**Nota de implementación:** La vista actual genera registros de ejemplo asociados a las pilas existentes. Para completar el CRUD del historial, es necesario conectar las operaciones de creación, consulta y actualización con un endpoint persistente en el backend y la base de datos. Los filtros y el reporte deben utilizar los registros reales disponibles.
+
+### Flujos End-to-End e Integración con la API
+
+La integración final busca garantizar la comunicación entre el frontend desarrollado en Flutter, la API construida con FastAPI y la base de datos utilizada por Smart Compost.
+
+**Actividades de integración:**
+
+- Unificación de las solicitudes realizadas desde el frontend hacia los endpoints de la API.
+- Validación de las respuestas recibidas y del manejo de errores de comunicación.
+- Verificación de la carga de información en los módulos del dashboard, pilas, sensores y alertas.
+- Implementación o revisión de los estados de carga y de los mensajes cuando ocurre un error.
+- Pruebas de los flujos completos desde la interfaz hasta la API y la base de datos.
+- Documentación de las actividades y los resultados correspondientes al Sprint Planning 4.
+
+#### Verificación del backend
+
+El endpoint de salud permite comprobar el estado de la API y de la conexión con la base de datos configurada.
+
+**Endpoint:** `GET /api/health`
+
+Para consultar su respuesta localmente, ejecutar:
+
+```powershell
+Invoke-RestMethod http://127.0.0.1:8000/api/health | ConvertTo-Json -Depth 5
+```
+
+Durante las pruebas locales se obtuvo una respuesta con estado `ok` y base de datos `up`. En esa ejecución, el backend estaba configurado para utilizar SQLite; por lo tanto, esta verificación no demuestra por sí sola que la conexión con MySQL mediante Docker Compose esté funcionando.
+
+#### Ejecución del proyecto en entorno local
+
+**Terminal 1 — Backend**
+
+```powershell
+cd backend
+python -m uvicorn app.main:app --reload
+```
+
+**Terminal 2 — Frontend**
+
+```powershell
+cd frontend
+flutter pub get
+flutter run -d chrome --dart-define=API_BASE_URL=http://localhost:8000
+```
+
+Antes de iniciar las pruebas de integración, verificar que la API esté activa y que el frontend utilice la URL correcta del backend.
+
+#### Pruebas automatizadas
+
+Desde la carpeta `backend`, ejecutar:
+
+```powershell
+python -m pytest -q
+```
+
+En una ejecución local se obtuvo el siguiente resultado:
+
+```text
+32 passed, 851 warnings
+```
+
+Las 32 pruebas finalizaron correctamente. Los avisos corresponden a advertencias de compatibilidad y uso de funciones o configuraciones que pueden requerir actualización. El resultado debe interpretarse como evidencia de esa ejecución de pruebas, no como una validación de todos los flujos de la aplicación ni de la conexión con MySQL.
+
+## Sprint Planning 4
+
+El trabajo de este sprint se centra en integrar las funcionalidades del dashboard, el historial de intervenciones y la comunicación entre el frontend, la API y la base de datos.
+
+**Objetivos del sprint:**
+
+- Consolidar la visualización de las lecturas y los estados de las pilas.
+- Conectar el historial de acciones con los datos persistentes del sistema.
+- Facilitar la búsqueda de intervenciones y la descarga de reportes en PDF.
+- Verificar los flujos completos de comunicación entre los módulos de Flutter y los servicios del backend.
+- Ejecutar pruebas de funcionamiento y documentar los resultados.
+
+**Criterios de aceptación:**
+
+- El dashboard presenta información obtenida de la API.
+- Los datos de sensores y pilas se visualizan correctamente cuando están disponibles.
+- El historial permite consultar registros reales y realizar las operaciones implementadas.
+- Los filtros y el reporte PDF funcionan con la información consultada.
+- Se validan los flujos principales entre frontend, backend y base de datos.
+- Los errores de comunicación se manejan sin bloquear la interfaz.
+- Se documentan las pruebas ejecutadas y las funcionalidades que continúan pendientes.
