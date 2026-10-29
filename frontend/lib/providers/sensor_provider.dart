@@ -2,9 +2,9 @@ import 'package:flutter/foundation.dart';
 import '../models/pila.dart';
 import '../models/sensor.dart';
 import '../services/api_service.dart';
+import 'notificaciones_provider.dart';
 
-/// Estado de los sensores: lista con filtros y CRUD.
-/// Las pantallas escuchan este ChangeNotifier con ListenableBuilder.
+
 class SensorProvider extends ChangeNotifier {
   final ApiService _api;
   SensorProvider([ApiService? api]) : _api = api ?? ApiService();
@@ -13,10 +13,9 @@ class SensorProvider extends ChangeNotifier {
   bool cargando = false;
   String? error;
 
-  /// Pilas disponibles (para el filtro y para asignar el sensor a una pila).
-  List<Pila> pilas = [];
 
-  // Filtros de la vista de Sensores (los mismos que acepta GET /sensores)
+  List<Pila> pilas = [];
+ 
   String busqueda = '';
   String? tipo;
   bool? activo;
@@ -44,6 +43,20 @@ class SensorProvider extends ChangeNotifier {
     }
   }
 
+  Future<Set<String>> codigosExistentes() async {
+    try {
+      final data = await _api.get('/sensores/');
+      return (data as List)
+          .map((e) =>
+              (e as Map<String, dynamic>)['codigo_dispositivo'] as String)
+          .map((c) => c.toUpperCase())
+          .toSet();
+    } catch (_) {
+      // Sin conexión con la API: usa los que ya están cargados en la vista.
+      return sensores.map((s) => s.codigo.toUpperCase()).toSet();
+    }
+  }
+
   Future<void> cargarPilas() async {
     try {
       final data = await _api.get('/pilas/');
@@ -53,7 +66,6 @@ class SensorProvider extends ChangeNotifier {
         ..sort((a, b) => a.nombre.compareTo(b.nombre));
       notifyListeners();
     } catch (_) {
-      // Sin pilas no se puede crear un sensor, pero la lista sigue funcionando.
     }
   }
 
@@ -90,6 +102,18 @@ class SensorProvider extends ChangeNotifier {
   Future<void> cambiarActivo(Sensor sensor) async {
     await _api.put('/sensores/${sensor.id}', {'activo': !sensor.activo});
     await cargar();
+  }
+
+
+  Future<void> reportarDano(String id, String detalle) async {
+    await _api.post('/sensores/$id/dano', {'detalle': detalle});
+    await Future.wait([cargar(), NotificacionesProvider.instance.cargar()]);
+  }
+
+ 
+  Future<void> marcarReparado(String id) async {
+    await _api.post('/sensores/$id/reparado', {});
+    await Future.wait([cargar(), NotificacionesProvider.instance.cargar()]);
   }
 
   Future<void> eliminar(String id) async {

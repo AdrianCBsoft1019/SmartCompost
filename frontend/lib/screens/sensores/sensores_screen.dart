@@ -1,16 +1,16 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import '../../models/sensor.dart';
+import '../../providers/notificaciones_provider.dart';
 import '../../providers/sensor_provider.dart';
 import '../../services/session.dart';
 import '../../theme/app_theme.dart';
 import '../../widgets/estado_chip.dart';
 import '../../widgets/panel_card.dart';
+import 'sensor_dano_dialog.dart';
 import 'sensor_form_dialog.dart';
 
-/// Vista de Sensores: tarjetas con filtros por tipo, estado y pila.
-/// El instructor (admin) crea, edita, activa/desactiva y elimina; el
-/// aprendiz solo consulta.
+
 class SensoresScreen extends StatefulWidget {
   const SensoresScreen({super.key});
 
@@ -29,10 +29,18 @@ class _SensoresScreenState extends State<SensoresScreen> {
     super.initState();
     _provider.cargarPilas();
     _provider.cargar();
+    NotificacionesProvider.instance.addListener(_alCambiarAvisos);
+  }
+
+  /// Cuando cambian los avisos (otro usuario reportó o reparó un sensor)
+  /// se recarga la lista para ver el estado actual.
+  void _alCambiarAvisos() {
+    if (mounted) _provider.cargar();
   }
 
   @override
   void dispose() {
+    NotificacionesProvider.instance.removeListener(_alCambiarAvisos);
     _debounce?.cancel();
     _provider.dispose();
     super.dispose();
@@ -46,7 +54,13 @@ class _SensoresScreenState extends State<SensoresScreen> {
   }
 
   Future<void> _crear() async {
-    final form = await mostrarFormularioSensor(context, pilas: _provider.pilas);
+    final codigos = await _provider.codigosExistentes();
+    if (!mounted) return;
+    final form = await mostrarFormularioSensor(
+      context,
+      pilas: _provider.pilas,
+      codigosExistentes: codigos,
+    );
     if (form == null) return;
     try {
       await _provider.crear(form);
@@ -72,6 +86,26 @@ class _SensoresScreenState extends State<SensoresScreen> {
     try {
       await _provider.cambiarActivo(sensor);
       _mensaje(sensor.activo ? 'Sensor desactivado' : 'Sensor activado');
+    } catch (e) {
+      _mensaje(e.toString(), error: true);
+    }
+  }
+
+  Future<void> _reportarDano(Sensor sensor) async {
+    final detalle = await mostrarDialogoDano(context, sensor);
+    if (detalle == null) return;
+    try {
+      await _provider.reportarDano(sensor.id, detalle);
+      _mensaje('Se notificó el daño del sensor ${sensor.codigo}');
+    } catch (e) {
+      _mensaje(e.toString(), error: true);
+    }
+  }
+
+  Future<void> _marcarReparado(Sensor sensor) async {
+    try {
+      await _provider.marcarReparado(sensor.id);
+      _mensaje('Sensor ${sensor.codigo} marcado como reparado');
     } catch (e) {
       _mensaje(e.toString(), error: true);
     }
@@ -256,15 +290,17 @@ class _SensoresScreenState extends State<SensoresScreen> {
     }
   }
 
-  Widget _chipEstado(bool activo) {
+  Widget _chipEstado(bool activo, {bool danado = false}) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
       decoration: BoxDecoration(
-        color: activo ? EstadoColores.verde : AppColors.textMuted,
+        color: danado
+            ? EstadoColores.rojo
+            : (activo ? EstadoColores.verde : AppColors.textMuted),
         borderRadius: BorderRadius.circular(20),
       ),
       child: Text(
-        activo ? 'ACTIVO' : 'INACTIVO',
+        danado ? 'DAÑADO' : (activo ? 'ACTIVO' : 'INACTIVO'),
         style: const TextStyle(
           color: Colors.white,
           fontSize: 10.5,
@@ -311,11 +347,12 @@ class _SensoresScreenState extends State<SensoresScreen> {
       decoration: BoxDecoration(
         color: AppColors.surface,
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: AppColors.border),
+        border: Border.all(
+            color: s.danado ? EstadoColores.rojo : AppColors.border),
       ),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Row(children: [
-          _chipEstado(s.activo),
+          _chipEstado(s.activo, danado: s.danado),
           const Spacer(),
           if (_admin)
             PopupMenuButton<String>(
@@ -325,12 +362,23 @@ class _SensoresScreenState extends State<SensoresScreen> {
                 if (v == 'editar') _editar(s);
                 if (v == 'estado') _cambiarEstado(s);
                 if (v == 'eliminar') _eliminar(s);
+                if (v == 'dano') {
+                  if (s.danado) {
+                    _marcarReparado(s);
+                  } else {
+                    _reportarDano(s);
+                  }
+                }
               },
               itemBuilder: (_) => [
                 const PopupMenuItem(value: 'editar', child: Text('Editar')),
                 PopupMenuItem(
                     value: 'estado',
                     child: Text(s.activo ? 'Desactivar' : 'Activar')),
+                PopupMenuItem(
+                    value: 'dano',
+                    child:
+                        Text(s.danado ? 'Marcar como reparado' : 'Reportar daño')),
                 const PopupMenuItem(value: 'eliminar', child: Text('Eliminar')),
               ],
             ),
@@ -364,8 +412,17 @@ class _SensoresScreenState extends State<SensoresScreen> {
           _dato('PLANTA', s.ubicacion ?? '--'),
         ]),
         const SizedBox(height: 8),
-        Text('Registrado el ${_fecha(s.creadoEn)}',
-            style: const TextStyle(color: AppColors.textMuted, fontSize: 11)),
+        if (s.danado)
+          Text('Daño: ${s.detalleDano ?? 'sin detalle'}',
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: const TextStyle(
+                  color: EstadoColores.rojo,
+                  fontSize: 11,
+                  fontWeight: FontWeight.w700))
+        else
+          Text('Registrado el ${_fecha(s.creadoEn)}',
+              style: const TextStyle(color: AppColors.textMuted, fontSize: 11)),
       ]),
     );
   }

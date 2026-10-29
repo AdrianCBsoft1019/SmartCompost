@@ -1,5 +1,4 @@
-/// Sensor tal como lo devuelve GET /sensores (incluye el nombre y la planta
-/// de su pila para poder listarlo sin pedir cada pila por separado).
+
 class Sensor {
   final String id;
   final String tipo; // humedad | temperatura | ph | gas_ch4 | nivel_agua
@@ -9,6 +8,8 @@ class Sensor {
   final DateTime creadoEn;
   final String? pilaNombre;
   final String? ubicacion;
+  final bool danado;
+  final String? detalleDano;
 
   const Sensor({
     required this.id,
@@ -19,6 +20,8 @@ class Sensor {
     required this.creadoEn,
     required this.pilaNombre,
     required this.ubicacion,
+    this.danado = false,
+    this.detalleDano,
   });
 
   factory Sensor.fromJson(Map<String, dynamic> j) => Sensor(
@@ -30,6 +33,8 @@ class Sensor {
         creadoEn: DateTime.parse('${j['creado_en']}Z'),
         pilaNombre: j['pila_nombre'] as String?,
         ubicacion: j['ubicacion'] as String?,
+        danado: (j['danado'] as bool?) ?? false,
+        detalleDano: j['detalle_dano'] as String?,
       );
 
   /// Valor del backend -> texto para mostrar.
@@ -42,6 +47,28 @@ class Sensor {
   };
 
   String get tipoLabel => tipos[tipo] ?? tipo;
+
+
+  static const prefijos = {
+    'temperatura': 'TMP',
+    'humedad': 'HUM',
+    'gas_ch4': 'CH4',
+    'ph': 'PH',
+    'nivel_agua': 'NIV',
+  };
+
+  /// Primer código `PREFIJO-NNN` que no usa ningún sensor existente.
+  /// [existentes] debe venir en mayúsculas.
+  static String codigoSugerido(String tipo, Set<String> existentes) {
+    final prefijo = prefijos[tipo] ?? 'SEN';
+    var n = 1;
+    String codigo;
+    do {
+      codigo = '$prefijo-${n.toString().padLeft(3, '0')}';
+      n++;
+    } while (existentes.contains(codigo.toUpperCase()));
+    return codigo;
+  }
 }
 
 /// Datos que envia el formulario de crear/editar sensor.

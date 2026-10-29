@@ -101,6 +101,10 @@ class Sensor(Base):
     pila_id = Column(UUID(as_uuid=False), ForeignKey("pilas.id"), nullable=False)
     activo = Column(Boolean, default=True)
     creado_en = Column(DateTime, default=datetime.utcnow)
+    # Averia del sensor: genera una notificacion hasta que se marque reparado.
+    danado = Column(Boolean, default=False, nullable=False)
+    detalle_dano = Column(String(255), nullable=True)
+    danado_en = Column(DateTime, nullable=True)
 
     pila = relationship("Pila", back_populates="sensores")
 

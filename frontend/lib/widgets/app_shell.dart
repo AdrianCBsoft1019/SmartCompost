@@ -8,11 +8,14 @@ import '../screens/perfil/usuarios_screen.dart';
 import '../screens/pilas/pilas_screen.dart';
 import '../screens/sensores/sensores_screen.dart';
 import '../models/usuario.dart';
+import '../providers/notificaciones_provider.dart';
 import '../screens/login_screen.dart';
 import '../services/api_service.dart';
 import '../services/session.dart';
 import '../theme/app_theme.dart';
 import 'avatar_usuario.dart';
+import 'campana_notificaciones.dart';
+import 'estado_chip.dart';
 
 class _Destino {
   final String titulo;
@@ -37,6 +40,42 @@ class _AppShellState extends State<AppShell> {
   void initState() {
     super.initState();
     _sincronizarSesion();
+    _configurarNotificaciones();
+  }
+
+  @override
+  void dispose() {
+    final avisos = NotificacionesProvider.instance;
+    avisos.onNueva = null;
+    avisos.onPendientes = null;
+    avisos.detener();
+    super.dispose();
+  }
+
+  /// Avisa (SnackBar rojo) cuando un sensor se daña y requiere arreglo.
+  void _configurarNotificaciones() {
+    final avisos = NotificacionesProvider.instance;
+    avisos.onNueva = (n) => _avisar(n.mensaje);
+    avisos.onPendientes = (total) => _avisar(total == 1
+        ? 'Hay 1 sensor dañado que requiere arreglo.'
+        : 'Hay $total sensores dañados que requieren arreglo.');
+    avisos.iniciar();
+  }
+
+  void _avisar(String texto) {
+    if (!mounted) return;
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(SnackBar(
+        backgroundColor: EstadoColores.rojo,
+        duration: const Duration(seconds: 10),
+        content: Text(texto),
+        action: SnackBarAction(
+          label: 'VER',
+          textColor: Colors.white,
+          onPressed: () => mostrarNotificaciones(context),
+        ),
+      ));
   }
 
 
@@ -135,6 +174,14 @@ class _AppShellState extends State<AppShell> {
                   ),
                 const Spacer(),
                 ListTile(
+                  leading: const IconoCampana(),
+                  title: const Text('Notificaciones',
+                      style: TextStyle(
+                          color: AppColors.textSecondary,
+                          fontWeight: FontWeight.w600)),
+                  onTap: () => mostrarNotificaciones(context),
+                ),
+                ListTile(
                   leading: _avatar(),
                   title: Text(u?.nombreCompleto ?? '',
                       maxLines: 1,
@@ -156,6 +203,7 @@ class _AppShellState extends State<AppShell> {
           backgroundColor: AppColors.background,
           title: Text(actual.titulo),
           actions: [
+            const CampanaNotificaciones(),
             Padding(padding: const EdgeInsets.only(right: 14), child: _avatar()),
           ],
         ),

@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import Optional
 
 from fastapi import APIRouter, Depends, HTTPException, status
@@ -51,6 +52,9 @@ def _a_salida(sensor: models.Sensor) -> dict:
         "creado_en": sensor.creado_en,
         "pila_nombre": sensor.pila.nombre if sensor.pila else None,
         "ubicacion": sensor.pila.ubicacion if sensor.pila else None,
+        "danado": bool(sensor.danado),
+        "detalle_dano": sensor.detalle_dano,
+        "danado_en": sensor.danado_en,
     }
 
 
@@ -124,6 +128,44 @@ def actualizar_sensor(
         if valor is None and campo != "codigo_dispositivo":
             continue
         setattr(sensor, campo, valor)
+    db.commit()
+    db.refresh(sensor)
+    return _a_salida(sensor)
+
+
+@router.post("/{sensor_id}/dano", response_model=schemas.SensorOut)
+def reportar_dano(
+    sensor_id: str,
+    datos: schemas.SensorDanoIn,
+    db: Session = Depends(get_db),
+    current_user: models.Usuario = Depends(solo_instructor),
+):
+    """Marca el sensor como dañado: genera una notificación para todos."""
+    sensor = _buscar_sensor(db, sensor_id)
+    detalle = datos.detalle.strip()
+    if len(detalle) < 5:
+        raise HTTPException(
+            status_code=422, detail="Describe el daño (mínimo 5 caracteres)"
+        )
+    sensor.danado = True
+    sensor.detalle_dano = detalle
+    sensor.danado_en = datetime.utcnow()
+    db.commit()
+    db.refresh(sensor)
+    return _a_salida(sensor)
+
+
+@router.post("/{sensor_id}/reparado", response_model=schemas.SensorOut)
+def marcar_reparado(
+    sensor_id: str,
+    db: Session = Depends(get_db),
+    current_user: models.Usuario = Depends(solo_instructor),
+):
+    """El sensor ya fue arreglado: se retira la notificación."""
+    sensor = _buscar_sensor(db, sensor_id)
+    sensor.danado = False
+    sensor.detalle_dano = None
+    sensor.danado_en = None
     db.commit()
     db.refresh(sensor)
     return _a_salida(sensor)

@@ -188,9 +188,30 @@ class SensorOut(BaseModel):
     creado_en: datetime
     pila_nombre: Optional[str]
     ubicacion: Optional[str]
+    danado: bool = False
+    detalle_dano: Optional[str] = None
+    danado_en: Optional[datetime] = None
 
     class Config:
         from_attributes = True
+
+
+class SensorDanoIn(BaseModel):
+    detalle: str = Field(min_length=5, max_length=255)
+
+
+class NotificacionOut(BaseModel):
+    id: str
+    tipo: str
+    sensor_id: str
+    sensor_codigo: str
+    sensor_tipo: str
+    pila_id: str
+    pila_nombre: Optional[str]
+    ubicacion: Optional[str]
+    detalle: str
+    mensaje: str
+    fecha: Optional[datetime]
 
 
 class Promedios(BaseModel):

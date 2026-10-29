@@ -5,9 +5,7 @@ import '../services/api_service.dart';
 import '../services/session.dart';
 import '../theme/app_theme.dart';
 
-/// Avatar circular: muestra la foto del usuario si la tiene y, si no, sus
-/// iniciales. La imagen se pide a la API con el JWT (GET /usuarios/{id}/foto)
-/// y se guarda en memoria para no repetir la descarga.
+
 class AvatarUsuario extends StatefulWidget {
   final Usuario usuario;
   final double radius;
