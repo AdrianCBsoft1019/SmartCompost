@@ -167,6 +167,8 @@ docker compose up --build -d --no-deps --force-recreate backend
 docker compose restart load-balancer
 ```
 
+El segundo comando es obligatorio: si no reinicia Nginx, la API responde `502 Bad Gateway`.
+
 ---
 
 ## 7. Problemas comunes al instalar

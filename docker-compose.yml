@@ -1,9 +1,7 @@
-version: "3.9"
-
 services:
+  # Base de datos MySQL
   db:
     image: mysql:8.0
-    container_name: smartcompost_db
     restart: unless-stopped
     environment:
       MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
@@ -13,15 +11,15 @@ services:
     volumes:
       - smartcompost_db_data:/var/lib/mysql
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1"]
       interval: 5s
       timeout: 5s
       retries: 10
 
+  # API de SmartCompost: 4 replicas identicas
   backend:
     build:
       context: ./backend
-    container_name: smartcompost_backend
     restart: unless-stopped
     environment:
       DB_HOST: db
@@ -32,11 +30,60 @@ services:
       JWT_SECRET_KEY: ${JWT_SECRET_KEY:-dev-secret-change-me}
       JWT_ALGORITHM: HS256
       ACCESS_TOKEN_EXPIRE_MINUTES: "120"
-    ports:
-      - "8000:8000"
+    # Solo se expone dentro de la red de Docker; se entra por Nginx
+    expose:
+      - "8000"
     depends_on:
       db:
         condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:8000/api/health', timeout=5)\" || exit 1"]
+      interval: 10s
+      timeout: 6s
+      retries: 3
+      start_period: 20s
+    deploy:
+      replicas: 4
+      resources:
+        limits:
+          cpus: "0.50"
+          memory: 256M
+
+  # Balanceador de carga
+  load-balancer:
+    image: nginx:alpine
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - backend
+
+  # Visor de logs
+  dozzle:
+    image: amir20/dozzle:latest
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    deploy:
+      resources:
+        limits:
+          cpus: "0.10"
+          memory: 64M
+
+  # Pruebas de carga
+  locust:
+    image: locustio/locust:2.31.8
+    ports:
+      - "8089:8089"
+    volumes:
+      - ./locustfile.py:/mnt/locust/locustfile.py:ro
+    command: -f /mnt/locust/locustfile.py --host http://load-balancer --web-host 0.0.0.0
+    depends_on:
+      - load-balancer
 
 volumes:
   smartcompost_db_data:

@@ -60,6 +60,12 @@ Luego busque su caso en esta tabla:
 
 ### Solución
 
+- **Si el 502 empezó justo después de actualizar o reiniciar las réplicas:** las réplicas nuevas tienen otra dirección IP y Nginx sigue buscando las viejas. Reinicie Nginx:
+
+  ```bash
+  docker compose restart load-balancer
+  ```
+
 - **Si dice `no live upstreams`:** revise que en `nginx.conf` las réplicas tengan `max_fails=0` y reinicie Nginx:
 
   ```bash
