@@ -34,25 +34,24 @@ Desde la raíz del proyecto:
 docker compose up --build
 ```
 
-Esto levanta dos contenedores:
+Esto levanta 8 contenedores: MySQL (`db`), 4 réplicas de la API (`backend`), Nginx (`load-balancer`) en `http://localhost`, Dozzle en `http://localhost:8080` y Locust en `http://localhost:8089`. La API ya no se publica en el puerto 8000: se entra siempre por Nginx.
 
-- `smartcompost_db` → MySQL 8.0, con la base `smartcompost` creada automáticamente.
-- `smartcompost_backend` → API FastAPI en `http://localhost:8000`, esperando a que la base de datos esté lista (`healthcheck`).
+El paso a paso completo está en [`MANUAL_INSTALACION.md`](MANUAL_INSTALACION.md) y la guía de fallas en [`RUNBOOK_INCIDENTES.md`](RUNBOOK_INCIDENTES.md).
 
 Para correrlo en segundo plano: `docker compose up --build -d`. Para detenerlo: `docker compose down` (agrega `-v` si además quieres borrar los datos de MySQL).
 
 ## 3. Verificar que el backend quedó arriba
 
-- `http://localhost:8000/` → debe responder `{"status": "ok", ...}`
-- `http://localhost:8000/api/health` → debe decir `"database": {"status": "up"}`
-- `http://localhost:8000/docs` → documentación interactiva (Swagger) para probar login y los CRUDs de Usuarios, Pilas y Sensores con el token JWT.
+- `http://localhost/` → debe responder `{"status": "ok", ...}`
+- `http://localhost/api/health` → debe decir `"database": {"status": "up"}`
+- `http://localhost/docs` → documentación interactiva (Swagger) para probar login y los CRUDs de Usuarios, Pilas y Sensores con el token JWT.
 
 ## 4. Correr el frontend (Flutter)
 
 ```bash
 cd frontend
 flutter pub get
-flutter run -d chrome --dart-define=API_BASE_URL=http://localhost:8000
+flutter run -d chrome --dart-define=API_BASE_URL=http://localhost
 ```
 
 Desde ahí puedes crear una cuenta en la pantalla de Registro e iniciar sesión desde Login; el usuario debe quedar guardado en la tabla `usuarios` de MySQL.
@@ -139,7 +138,7 @@ Una alerta aparece cuando una lectura supera los limites de una variable (temper
 - **Sensores**: listado con filtros; el administrador crea, edita, desactiva y elimina, el estudiante solo consulta.
 - **Alertas**: selector de periodo, tarjetas de resumen, graficas (por dia, variable, pila y sensor), historial con filtros y boton **Descargar PDF**. Es igual para administrador y estudiante.
 
-Para probar los endpoints sin Postman usa Swagger en `http://localhost:8000/docs`: inicia sesion en `/auth/login`, pulsa **Authorize** con el token y prueba `/sensores` y `/alertas`.
+Para probar los endpoints sin Postman usa Swagger en `http://localhost/docs`: inicia sesion en `/auth/login`, pulsa **Authorize** con el token y prueba `/sensores` y `/alertas`.
 
 ## 7. Pruebas y calidad de codigo
 
