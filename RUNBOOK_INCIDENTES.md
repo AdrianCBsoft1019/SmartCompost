@@ -1,8 +1,6 @@
-# Runbook de Operaciones e Incidentes - SmartCompost (RAP 1)
+# Runbook de Operaciones e Incidentes - SmartCompost
 
-**Propósito:** guía rápida para saber qué hacer cuando algo falla en el entorno de SmartCompost (4 réplicas de la API, Nginx, MySQL, Dozzle y Locust).
-
-## Antes de empezar: revisión rápida
+## Antes de empezar toca que revisen
 
 Ante cualquier falla, haga siempre estos 3 pasos:
 
