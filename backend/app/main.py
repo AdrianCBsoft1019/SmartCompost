@@ -7,7 +7,16 @@ from sqlalchemy import text
 from sqlalchemy.exc import OperationalError
 
 from .database import Base, engine, SessionLocal
-from .routers import alertas, analisis, auth, usuarios, pilas, sensores, notificaciones
+from .routers import (
+    alertas,
+    analisis,
+    auth,
+    iot,
+    usuarios,
+    pilas,
+    sensores,
+    notificaciones,
+)
 from . import log_model  # noqa: F401
 from .log_service import log_error_bd
 
@@ -39,6 +48,7 @@ app.include_router(sensores.router)
 app.include_router(analisis.router)
 app.include_router(alertas.router)
 app.include_router(notificaciones.router)
+app.include_router(iot.router)
 
 
 @app.get("/", tags=["Salud"])

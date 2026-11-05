@@ -140,6 +140,23 @@ def estado_desde_semaforo(semaforo: str, madurez_pct: float) -> str:
     return {"verde": "normal", "amarillo": "atencion", "rojo": "critico"}[semaforo]
 
 
+def guardar_lectura(
+    db: Session, pila: models.Pila, valores: dict
+) -> tuple[models.Lectura, dict]:
+    """Guarda la lectura, la evalua y actualiza el estado de la pila.
+
+    La usan la carga manual (/pilas/{id}/lecturas) y el ESP32 (/iot/lecturas).
+    """
+    lectura = models.Lectura(pila_id=pila.id, **valores)
+    db.add(lectura)
+    evaluacion = evaluar_lectura(lectura)
+    madurez = calcular_madurez(pila.fecha_inicio, pila.dias_ciclo)
+    pila.estado = estado_desde_semaforo(evaluacion["semaforo"], madurez["madurez_pct"])
+    db.commit()
+    db.refresh(lectura)
+    return lectura, evaluacion
+
+
 def ultima_lectura(db: Session, pila_id: str) -> Optional[models.Lectura]:
     return (
         db.query(models.Lectura)
