@@ -2,7 +2,7 @@ from .test_api import _primera_pila
 
 
 def _lectura(client, headers, pila_id, **valores):
-    datos = {"temperatura": 50, "humedad": 55}
+    datos = {"temperatura": 30, "humedad": 55}
     datos.update(valores)
     r = client.post(f"/pilas/{pila_id}/lecturas", json=datos, headers=headers)
     assert r.status_code == 201, r.text
@@ -28,13 +28,13 @@ def test_lectura_fuera_de_limite_genera_alerta_activa(client, admin):
     assert len(alertas) == 1
     a = alertas[0]
     assert a["variable"] == "temperatura" and a["valor"] == 90
-    assert a["limite"] == 70 and a["lado"] == "maximo" and a["activa"] is True
+    assert a["limite"] == 45 and a["lado"] == "maximo" and a["activa"] is True
     assert a["pila"] == pila["nombre"]
     assert a["sensor_codigo"] is not None  # el seed tiene sensor de temperatura
     assert "supera el maximo" in a["mensaje"]
 
     # Una lectura nueva y normal apaga la alerta activa, pero queda en el historial.
-    _lectura(client, admin, pila["id"], temperatura=50)
+    _lectura(client, admin, pila["id"], temperatura=30)
     activas = client.get(
         f"/alertas/?pila_id={pila['id']}&solo_activas=true", headers=admin
     ).json()
@@ -51,7 +51,7 @@ def test_humedad_baja_es_alerta_de_minimo(client, admin):
         headers=admin,
     ).json()
     assert len(alertas) == 1
-    assert alertas[0]["lado"] == "minimo" and alertas[0]["limite"] == 40
+    assert alertas[0]["lado"] == "minimo" and alertas[0]["limite"] == 30
 
 
 def test_filtros_y_limite(client, admin):

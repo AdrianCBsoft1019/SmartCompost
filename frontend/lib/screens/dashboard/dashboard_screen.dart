@@ -124,7 +124,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       child: _buildMetricCard(
                         title: 'Humedad Relativa',
                         value: '${humedadPromedio.toInt()}%',
-                        subtitle: 'Rango recomendado: 55-65%',
+                        subtitle: 'Mínimo recomendado: 30%',
                         badgeText: 'Activo',
                         badgeColor: Colors.blueAccent,
                         icon: Icons.water_drop,
@@ -135,7 +135,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     Expanded(
                       child: _buildAlertCard(
                         title: 'Niveles del Sistema',
-                        status: pilas.any((p) => (p.temperatura ?? 0) > 70) ? 'ALERTA' : 'ESTABLE',
+                        status: pilas.any((p) =>
+                                p.temperatura != null &&
+                                (p.temperatura! < 15 || p.temperatura! > 45))
+                            ? 'ALERTA'
+                            : 'ESTABLE',
                         detail: 'Total de pilas en sistema: ${pilas.length}',
                       ),
                     ),

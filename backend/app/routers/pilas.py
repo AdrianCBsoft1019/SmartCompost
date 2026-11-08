@@ -96,16 +96,7 @@ def registrar_lectura(
                 status_code=404, detail="El sensor no pertenece a esta pila"
             )
 
-    lectura = models.Lectura(pila_id=pila_id, **datos.model_dump())
-    db.add(lectura)
-
-    evaluacion = pila_service.evaluar_lectura(lectura)
-    madurez = pila_service.calcular_madurez(pila.fecha_inicio, pila.dias_ciclo)
-    pila.estado = pila_service.estado_desde_semaforo(
-        evaluacion["semaforo"], madurez["madurez_pct"]
-    )
-    db.commit()
-    db.refresh(lectura)
+    lectura, evaluacion = pila_service.guardar_lectura(db, pila, datos.model_dump())
     return {"lectura": lectura, "evaluacion": evaluacion}
 
 

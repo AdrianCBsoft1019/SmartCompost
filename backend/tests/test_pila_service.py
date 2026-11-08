@@ -20,23 +20,23 @@ def test_madurez_nunca_pasa_de_100():
 
 
 def test_semaforo_verde():
-    r = pila_service.evaluar_valores({"temperatura": 55, "humedad": 55, "co2_ppm": 500})
+    r = pila_service.evaluar_valores({"temperatura": 30, "humedad": 55, "co2_ppm": 500})
     assert r["semaforo"] == "verde" and r["indicador"] == "seguro"
 
 
 def test_semaforo_amarillo_cerca_del_limite():
-    r = pila_service.evaluar_valores({"temperatura": 66, "humedad": 55})
+    r = pila_service.evaluar_valores({"temperatura": 42, "humedad": 55})
     assert r["semaforo"] == "amarillo" and r["indicador"] == "seguro"
 
 
 def test_semaforo_rojo_por_temperatura_y_humedad_baja():
-    r = pila_service.evaluar_valores({"temperatura": 75, "humedad": 30})
+    r = pila_service.evaluar_valores({"temperatura": 48, "humedad": 25})
     assert r["semaforo"] == "rojo" and r["indicador"] == "inseguro"
     assert len(r["violaciones"]) == 2
 
 
 def test_valores_nulos_se_ignoran():
-    r = pila_service.evaluar_valores({"temperatura": 50, "co2_ppm": None})
+    r = pila_service.evaluar_valores({"temperatura": 30, "co2_ppm": None})
     assert r["semaforo"] == "verde"
 
 

@@ -19,10 +19,11 @@ from .database import Base, SessionLocal, engine
 
 # nombre, planta, dias desde inicio, temp base, humedad base, gas base (x CO2)
 PILAS_DEMO = [
-    ("Pila A-102", "Planta Norte", 40, 64.0, 55.0, 1.0),
-    ("Pila B-205", "Planta Sur", 90 * 45 // 100, 33.0, 60.0, 0.5),
-    ("Pila C-088", "Zona Experimental", 88, 24.0, 45.0, 0.3),
-    ("Pila D-112", "Planta Norte", 55, 62.0, 52.0, 0.8),
+    # Temperaturas dentro de lo que mide el DHT11 (0-50 C).
+    ("Pila A-102", "Planta Norte", 40, 38.0, 55.0, 1.0),
+    ("Pila B-205", "Planta Sur", 90 * 45 // 100, 30.0, 60.0, 0.5),
+    ("Pila C-088", "Zona Experimental", 88, 22.0, 45.0, 0.3),
+    ("Pila D-112", "Planta Norte", 55, 34.0, 52.0, 0.8),
 ]
 
 

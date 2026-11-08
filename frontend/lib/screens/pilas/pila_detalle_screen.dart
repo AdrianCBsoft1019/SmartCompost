@@ -22,7 +22,9 @@ class _PilaDetalleScreenState extends State<PilaDetalleScreen> {
   final _provider = PilaProvider();
 
   static const _orden = ['mesofilica', 'termofilica', 'enfriamiento', 'maduracion'];
-  static const _limiteTemp = 70.0;
+  // Mismos limites que el prototipo con DHT11 (pila_service.LIMITES)
+  static const _limiteTemp = 45.0;
+  static const _humedadMin = 30.0;
 
   @override
   void initState() {
@@ -328,7 +330,7 @@ class _PilaDetalleScreenState extends State<PilaDetalleScreen> {
 
   Widget _tarjetaHumedad(PilaDetalle d) {
     final h = d.pila.humedad;
-    final fuera = h != null && (h < 40 || h > 65);
+    final fuera = h != null && h < _humedadMin;
     final color = fuera ? EstadoColores.rojo : EstadoColores.azul;
     return PanelCard(
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -342,7 +344,7 @@ class _PilaDetalleScreenState extends State<PilaDetalleScreen> {
           const SizedBox(width: 8),
           Padding(
             padding: const EdgeInsets.only(bottom: 6),
-            child: Text(fuera ? 'Fuera de rango (40–65 %)' : 'Estable',
+            child: Text(fuera ? 'Por debajo del 30 %' : 'Estable',
                 style: TextStyle(color: color, fontSize: 12)),
           ),
         ]),

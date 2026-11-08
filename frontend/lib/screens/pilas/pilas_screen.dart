@@ -254,8 +254,9 @@ class _PilasScreenState extends State<PilasScreen> {
   }
 
   Widget _tarjeta(Pila p) {
-    final tempFuera = p.temperatura != null && p.temperatura! > 70;
-    final humFuera = p.humedad != null && (p.humedad! < 40 || p.humedad! > 65);
+    final tempFuera =
+        p.temperatura != null && (p.temperatura! < 15 || p.temperatura! > 45);
+    final humFuera = p.humedad != null && p.humedad! < 30;
     return InkWell(
       borderRadius: BorderRadius.circular(14),
       onTap: () => _abrirDetalle(p),

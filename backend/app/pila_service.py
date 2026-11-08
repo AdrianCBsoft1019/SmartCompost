@@ -15,8 +15,10 @@ from . import models
 
 # Limites de seguridad. (minimo, maximo); None = sin limite en ese lado.
 LIMITES: dict[str, tuple[Optional[float], Optional[float]]] = {
-    "temperatura": (None, 70.0),  # >70 C mata la microbiologia util
-    "humedad": (40.0, 65.0),  # % ideal para compostaje aerobio
+    # Mismos valores que el prototipo (sensor DHT11, mide 0-50 C y 20-90 %):
+    # el Arduino riega si la temperatura sale de 15-45 C o la humedad baja de 30 %.
+    "temperatura": (15.0, 45.0),
+    "humedad": (30.0, None),  # sin maximo: al 66 % el aparato deja de regar
     "co2_ppm": (None, 1000.0),
     "ch4_ppm": (None, 500.0),
     "nh3_ppm": (None, 25.0),
@@ -138,6 +140,23 @@ def estado_desde_semaforo(semaforo: str, madurez_pct: float) -> str:
     if madurez_pct >= 100:
         return "listo"
     return {"verde": "normal", "amarillo": "atencion", "rojo": "critico"}[semaforo]
+
+
+def guardar_lectura(
+    db: Session, pila: models.Pila, valores: dict
+) -> tuple[models.Lectura, dict]:
+    """Guarda la lectura, la evalua y actualiza el estado de la pila.
+
+    La usan la carga manual (/pilas/{id}/lecturas) y el ESP32 (/iot/lecturas).
+    """
+    lectura = models.Lectura(pila_id=pila.id, **valores)
+    db.add(lectura)
+    evaluacion = evaluar_lectura(lectura)
+    madurez = calcular_madurez(pila.fecha_inicio, pila.dias_ciclo)
+    pila.estado = estado_desde_semaforo(evaluacion["semaforo"], madurez["madurez_pct"])
+    db.commit()
+    db.refresh(lectura)
+    return lectura, evaluacion
 
 
 def ultima_lectura(db: Session, pila_id: str) -> Optional[models.Lectura]:
