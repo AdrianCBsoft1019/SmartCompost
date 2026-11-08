@@ -15,8 +15,10 @@ from . import models
 
 # Limites de seguridad. (minimo, maximo); None = sin limite en ese lado.
 LIMITES: dict[str, tuple[Optional[float], Optional[float]]] = {
-    "temperatura": (None, 70.0),  # >70 C mata la microbiologia util
-    "humedad": (40.0, 65.0),  # % ideal para compostaje aerobio
+    # Mismos valores que el prototipo (sensor DHT11, mide 0-50 C y 20-90 %):
+    # el Arduino riega si la temperatura sale de 15-45 C o la humedad baja de 30 %.
+    "temperatura": (15.0, 45.0),
+    "humedad": (30.0, None),  # sin maximo: al 66 % el aparato deja de regar
     "co2_ppm": (None, 1000.0),
     "ch4_ppm": (None, 500.0),
     "nh3_ppm": (None, 25.0),

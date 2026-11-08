@@ -28,7 +28,7 @@ def _linea_uno(**cambios):
     datos = {
         "codigo_dispositivo": "ESP32-01",
         "humedad": 55,
-        "temperatura": 58.4,
+        "temperatura": 28.4,
         "mq2": 310,
         "mq135": 420,
         "gas": 420,
@@ -48,12 +48,12 @@ def test_esp32_registra_lectura_en_su_pila(client, admin, dispositivo):
     assert r.status_code == 201, r.text
     lectura = r.json()["lectura"]
     assert lectura["pila_id"] == dispositivo["pila"]["id"]
-    assert lectura["temperatura"] == 58.4 and lectura["humedad"] == 55
+    assert lectura["temperatura"] == 28.4 and lectura["humedad"] == 55
     assert lectura["co2_ppm"] > 400 and lectura["nh3_ppm"] > 0
     assert lectura["ch4_ppm"] > 0
 
     pila = client.get(f"/pilas/{dispositivo['pila']['id']}", headers=admin).json()
-    assert pila["temperatura"] == 58.4
+    assert pila["temperatura"] == 28.4
 
 
 def test_esp32_lectura_critica_cambia_estado(client, admin, dispositivo):

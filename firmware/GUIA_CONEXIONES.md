@@ -53,7 +53,16 @@ El **DHT11** mide las dos cosas a la vez: temperatura **de 0 a 50 °C** y humeda
 
 El volteo periódico y la emergencia de gas siguen funcionando.
 
-> **Ojo con los límites de la página:** `backend/app/pila_service.py` (`LIMITES`) y algunas pantallas de Flutter todavía usan humedad 40–65 % y temperatura máxima de 70 °C. Si quieren que la página use los mismos valores del aparato, hay que cambiarlos allí también.
+**La página usa los mismos límites** (`backend/app/pila_service.py`, `LIMITES`, y las pantallas de Flutter):
+
+| En la página | Color |
+|---|---|
+| Temperatura < 15 °C o > 45 °C | rojo (alerta) |
+| Temperatura entre 15–16.5 °C o entre 40.5–45 °C | amarillo (cerca del límite) |
+| Humedad < 30 % | rojo (alerta) |
+| Humedad entre 30 y 33 % | amarillo |
+
+La humedad no tiene máximo: al llegar a 66 % el aparato solo deja de regar. Si cambian un valor en el Arduino, cámbienlo también en `LIMITES`.
 
 ## 3. Poner a funcionar el enlace con la página (paso a paso)
 
@@ -99,7 +108,7 @@ Tinkercad **no tiene DHT11 ni ESP32**. Por eso allí se simula así, y en el có
 | MQ-2 / MQ-135 | **Sensor de gas** × 2 |
 | Bomba y motor 12 V | **Motor de CC** × 2 (rotulados "Bomba" y "Volteo") |
 | Fuente 12 V | **Fuente de alimentación** ajustada a 12 V |
-| Transistores | Transistor NPN (BJT) × 2, con resistencia de base de 470 Ω o 1 kΩ |
+| Transistores | Transistor NPN (BJT) × 2 (2N2222A y 2N3904), con resistencia de base de 470 Ω o 1 kΩ |
 | LCD 16x2 | LCD 16 x 2 (la normal) + **potenciómetro 10 kΩ** para el contraste |
 | Buzzer | Piezo |
 
@@ -157,30 +166,26 @@ Tinkercad **no tiene DHT11 ni ESP32**. Por eso allí se simula así, y en el có
 - **Condensador**: lee el voltaje impreso en él. Si dice **25 V o más**, va entre +12 V y GND, respetando la polaridad. Si dice **16 V o menos, no lo pongas en los 12 V**, porque puede explotar. En ese caso, ponlo entre 5V y GND del Arduino, cerca de los MQ.
 - **El GND de la fuente de 12 V se une al GND del Arduino.**
 
-### 5.2 Sus motores y su transistor
-Según las fotos tienen:
+### 5.2 Sus motores y sus transistores
+Tienen:
 - **Mini bomba de 12 V** (blanca): consume unos 150–300 mA.
-- **Motorreductor pequeño de 12 V** (motor plateado con caja de engranajes dorada): unos 50–100 mA girando suave y hasta unos 300–400 mA si se traba.
-- **Transistores pequeños de 3 patas, encapsulado TO-92** (negros, con una cara plana).
+- **Motorreductor pequeño de 12 V** (plateado con caja dorada): unos 50–100 mA girando, hasta unos 300 mA si se traba.
 
-Con motores así de pequeños, **sí sirven esos transistores**, uno para la bomba y otro para el motor, siempre que sean de los que aguantan 500 mA o más. Miren el código con una linterna o una lupa:
+| Transistor | Tipo | Aguanta | Uso |
+|---|---|---|---|
+| **2N2222A** | NPN | 600 mA | **Bomba (D9)**. Si tienen dos, úsenlo también en el motor |
+| **2N3904** | NPN | 200 mA | **Motor de volteo (D10)**, si solo tienen un 2N2222A |
+| **2N3905** | PNP | — | **No se usa**: este circuito necesita NPN |
 
-| Código impreso | ¿Sirve? |
-|---|---|
-| 2N2222 / 2N2222A, S8050, PN2222 | **Sí**, para los dos |
-| 2N3904, BC547, BC548 | Solo aguantan 100–200 mA: pueden servir para el motor, pero se calientan con la bomba |
-| S8550, 2N3906, BC557 | **No** (son PNP: este circuito no funciona con ellos) |
+**Patas** del 2N2222A y del 2N3904: miren la cara plana, con las letras hacia ustedes y las patas hacia abajo. De izquierda a derecha son **E – B – C**:
+- **E (Emisor)** → GND
+- **B (Base)** → resistencia → pin D9 / D10
+- **C (Colector)** → cable negativo (−) del motor o de la bomba
 
-**Patas del transistor**, mirando la cara plana con las letras hacia ti y las patas hacia abajo:
-- 2N2222A, 2N3904 y PN2222: **E B C** (Emisor, Base, Colector) de izquierda a derecha.
-- S8050: E B C en la mayoría.
-- BC547 y BC548: **C B E**.
+**Resistencia de base:** 470 Ω si tienen, o 1 kΩ.
 
-Si el código no se lee bien, búsquenlo en internet como "<código> pinout".
-
-- **Resistencia de base:** usen **470 Ω** si tienen. Si no, 1 kΩ. Con 470 Ω el transistor conduce mejor y se calienta menos.
-- **Prueba de temperatura:** dejen la bomba encendida 1 minuto y toquen el transistor. Si quema, cambien por otro de los que tengan o bajen la resistencia de base a 330 Ω (no menos).
-- **Torque del motor:** este motorreductor tiene poca fuerza. Hagan las aspas livianas y no las llenen de compost apretado. Si el motor se traba, consume más corriente y calienta el transistor.
+- **Si el 2N3904 queda en el motor:** las aspas deben girar libres y livianas. Si el motor se traba, consume más de 200 mA y el 2N3904 se calienta. Prueben 1 minuto y toquen el transistor: si quema, pásenle el 2N2222A al motor o aligeren las aspas.
+- **Diodo:** cada motor lleva el suyo, banda hacia +12 V. Con transistores tan pequeños no es opcional: sin él se queman.
 
 ### 5.3 Probar en Tinkercad
 Pon `#define MODO_PRUEBA 1` para que los tiempos sean 10 veces más cortos:
