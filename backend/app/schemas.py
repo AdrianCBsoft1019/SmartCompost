@@ -118,6 +118,25 @@ class LecturaCreate(BaseModel):
     sensor_id: Optional[str] = None
 
 
+class LecturaDispositivoIn(BaseModel):
+    """Lo que envia el ESP32 (reenvia la linea JSON del Arduino UNO).
+
+    Los MQ llegan crudos (0-1023) y el servidor los convierte a ppm. Los
+    campos de estado (riego, volteo...) se aceptan pero aun no se guardan.
+    """
+
+    codigo_dispositivo: str = Field(min_length=3, max_length=60)
+    temperatura: float = Field(ge=-20, le=120)
+    humedad: float = Field(ge=0, le=100)
+    mq2: Optional[int] = Field(default=None, ge=0, le=1023)
+    mq135: Optional[int] = Field(default=None, ge=0, le=1023)
+    riego: Optional[bool] = None
+    volteo: Optional[bool] = None
+    emergenciaGas: Optional[bool] = None
+    alarma: Optional[bool] = None
+    estado: Optional[str] = Field(default=None, max_length=30)
+
+
 class LecturaOut(BaseModel):
     id: str
     pila_id: str

@@ -266,3 +266,9 @@ El trabajo de este sprint se centra en integrar las funcionalidades del dashboar
 - Se validan los flujos principales entre frontend, backend y base de datos.
 - Los errores de comunicación se manejan sin bloquear la interfaz.
 - Se documentan las pruebas ejecutadas y las funcionalidades que continúan pendientes.
+
+## Prototipo físico (Arduino UNO + ESP32)
+
+El código del dispositivo está en [`firmware/`](firmware/) y la guía de circuito, Tinkercad y conexión con la API en [`firmware/GUIA_CONEXIONES.md`](firmware/GUIA_CONEXIONES.md).
+
+El ESP32 envía las lecturas a `POST /iot/lecturas` con la cabecera `X-API-Key` (variable `IOT_API_KEY`). La lectura queda en la pila del sensor registrado con el mismo `codigo_dispositivo`, y los MQ-2 / MQ-135 se convierten a ppm de CH4, CO2 y NH3 (`backend/app/gases_service.py`).
