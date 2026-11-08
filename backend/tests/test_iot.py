@@ -76,7 +76,7 @@ def test_esp32_rechazos(client, admin, dispositivo, monkeypatch):
     ok = {"X-API-Key": CLAVE}
     desconocido = _linea_uno(codigo_dispositivo="NO-EXISTE")
     assert client.post(url, json=desconocido, headers=ok).status_code == 404
-    # DS18B20 desconectado devuelve -127 C: no se guarda
+    # temperatura imposible (sensor mal conectado): no se guarda
     assert (
         client.post(url, json=_linea_uno(temperatura=-127), headers=ok).status_code
         == 422
