@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <!-- Flutter reemplaza $FLUTTER_BASE_HREF al construir (flutter build web). -->
+  <base href="$FLUTTER_BASE_HREF">
+  <meta charset="UTF-8">
+  <meta content="IE=Edge" http-equiv="X-UA-Compatible">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- Lo que muestra Google en los resultados -->
+  <title>SmartCompost – Compostaje inteligente | SENA Mosquera</title>
+  <meta name="description" content="SmartCompost es un sistema de compostaje inteligente del SENA, Centro de Biotecnología Agropecuaria de Mosquera: sensores de temperatura, humedad y gases que riegan y voltean el compost automáticamente y envían los datos a esta plataforma web.">
+  <meta name="keywords" content="SmartCompost, Smart Compost, compostaje inteligente, compost, SENA, Mosquera, Arduino, ESP32, sensores, IoT">
+  <link rel="canonical" href="https://smartcompost-web.onrender.com/">
+
+  <!-- Vista previa al compartir el enlace (WhatsApp, Facebook...) -->
+  <meta property="og:title" content="SmartCompost – Compostaje inteligente">
+  <meta property="og:description" content="Monitoreo y control automático de pilas de compostaje con sensores, riego y volteo. Proyecto SENA Mosquera.">
+  <meta property="og:url" content="https://smartcompost-web.onrender.com/">
+  <meta property="og:type" content="website">
+  <meta property="og:locale" content="es_CO">
+
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="apple-mobile-web-app-title" content="SmartCompost">
+  <link rel="apple-touch-icon" href="icons/Icon-192.png">
+  <link rel="icon" type="image/png" href="favicon.png">
+  <link rel="manifest" href="manifest.json">
+
+  <style>
+    #intro { font-family: system-ui, "Segoe UI", sans-serif; max-width: 640px; margin: 12vh auto; padding: 0 20px; color: #1c241e; line-height: 1.55; }
+    #intro h1 { color: #23784a; margin: 0 0 8px; }
+    #intro .cargando { color: #5b675d; }
+  </style>
+</head>
+<body>
+  <!-- Texto que Google puede leer; se quita cuando la aplicación termina de cargar. -->
+  <main id="intro">
+    <h1>SmartCompost</h1>
+    <p><strong>Compostaje inteligente</strong> – SENA, Centro de Biotecnología Agropecuaria, Mosquera.</p>
+    <p>SmartCompost mide la temperatura, la humedad y los gases (metano, CO₂ y amoniaco) de las pilas de compostaje.
+       Cuando hace falta, riega y voltea el compost automáticamente, y muestra todo en tiempo real en esta plataforma:
+       estado de cada pila, alertas, análisis y reportes.</p>
+    <p class="cargando">Cargando la plataforma…</p>
+  </main>
+  <script>
+    window.addEventListener('flutter-first-frame', function () {
+      var intro = document.getElementById('intro');
+      if (intro) intro.remove();
+    });
+  </script>
+  <script src="flutter_bootstrap.js" async></script>
+</body>
+</html>
