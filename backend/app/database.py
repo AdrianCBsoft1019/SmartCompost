@@ -1,4 +1,6 @@
 import os
+import ssl
+
 from dotenv import load_dotenv
 from sqlalchemy import create_engine
 from sqlalchemy.exc import OperationalError
@@ -18,9 +20,13 @@ DATABASE_URL = os.getenv("DATABASE_URL") or (
     f"@{DB_HOST}:{DB_PORT}/{DB_NAME}?charset=utf8mb4"
 )
 
-_connect_args = (
-    {"check_same_thread": False} if DATABASE_URL.startswith("sqlite") else {}
-)
+if DATABASE_URL.startswith("sqlite"):
+    _connect_args = {"check_same_thread": False}
+elif os.getenv("DB_SSL", "false").lower() == "true":
+    # TiDB Cloud exige conexion cifrada (usa los certificados del sistema).
+    _connect_args = {"ssl": ssl.create_default_context()}
+else:
+    _connect_args = {}
 engine = create_engine(DATABASE_URL, pool_pre_ping=True, connect_args=_connect_args)
 
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
