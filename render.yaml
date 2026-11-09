@@ -26,3 +26,5 @@ services:
         value: smartcompost
       - key: JWT_SECRET_KEY
         generateValue: true
+      - key: DB_SSL
+        value: "true"
