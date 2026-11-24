@@ -13,6 +13,7 @@ from sqlalchemy import (
     LargeBinary,
     String,
 )
+from sqlalchemy.dialects.mysql import LONGBLOB
 from sqlalchemy.orm import deferred, relationship
 
 from .database import Base
@@ -45,7 +46,10 @@ class Usuario(Base):
     creado_en = Column(DateTime, default=datetime.utcnow)
     # Foto de perfil (PNG 256x256). `deferred`: el binario solo se lee
     # cuando se pide, para no cargarlo en cada listado de usuarios.
-    foto = deferred(Column(LargeBinary, nullable=True))
+    # En MySQL/TiDB LargeBinary seria BLOB (maximo 64 KB): se usa LONGBLOB.
+    foto = deferred(
+        Column(LargeBinary().with_variant(LONGBLOB(), "mysql"), nullable=True)
+    )
     foto_tipo = Column(String(30), nullable=True)
 
     pilas = relationship("Pila", back_populates="responsable")

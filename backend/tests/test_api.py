@@ -126,7 +126,7 @@ def test_foto_de_perfil_admin_y_estudiante(client, admin, estudiante):
         )
         assert r.status_code == 200 and r.json()["tiene_foto"] is True
         foto = client.get("/usuarios/me/foto", headers=headers)
-        assert foto.headers["content-type"] == "image/png"
+        assert foto.headers["content-type"] == "image/jpeg"
         assert Image.open(io.BytesIO(foto.content)).size == (256, 256)
 
     yo_estudiante = client.get("/usuarios/me", headers=estudiante).json()
@@ -137,6 +137,28 @@ def test_foto_de_perfil_admin_y_estudiante(client, admin, estudiante):
     r = client.delete("/usuarios/me/foto", headers=estudiante)
     assert r.json()["tiene_foto"] is False
     assert client.get("/usuarios/me/foto", headers=estudiante).status_code == 404
+
+
+def test_foto_de_perfil_cabe_en_un_blob_de_64kb():
+    """Una foto real (con ruido y detalle) debe quedar muy por debajo de 64 KB."""
+    import io
+    import random
+
+    from PIL import Image
+
+    from app import foto_service
+
+    random.seed(1)
+    img = Image.new("RGB", (1600, 1200))
+    img.putdata([
+        (random.randrange(256), random.randrange(256), random.randrange(256))
+        for _ in range(1600 * 1200)
+    ])
+    buffer = io.BytesIO()
+    img.save(buffer, format="JPEG", quality=95)
+    resultado = foto_service.procesar_imagen(buffer.getvalue())
+    assert len(resultado) < 64 * 1024
+    assert Image.open(io.BytesIO(resultado)).format == "JPEG"
 
 
 def test_foto_de_perfil_rechaza_archivos_invalidos(client, admin):

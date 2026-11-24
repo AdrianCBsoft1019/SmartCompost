@@ -22,6 +22,22 @@ from .log_service import log_error_bd
 
 Base.metadata.create_all(bind=engine)
 
+
+def _ampliar_columna_foto() -> None:
+    """Bases creadas antes con create_all dejaron `usuarios.foto` como BLOB
+    (maximo 64 KB) y subir una foto fallaba. Se amplia a LONGBLOB; es
+    idempotente y no borra datos."""
+    if engine.dialect.name != "mysql":
+        return
+    try:
+        with engine.begin() as conn:
+            conn.execute(text("ALTER TABLE usuarios MODIFY foto LONGBLOB NULL"))
+    except Exception as error:  # no impedir que la API arranque
+        print(f"No se pudo ampliar usuarios.foto a LONGBLOB: {error}")
+
+
+_ampliar_columna_foto()
+
 _INICIO_SERVIDOR = time.time()
 
 app = FastAPI(
