@@ -49,7 +49,6 @@ class _PilaDetalleScreenState extends State<PilaDetalleScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: AppColors.background,
         title: Text('Detalle de ${widget.titulo}'),
         actions: [
           IconButton(

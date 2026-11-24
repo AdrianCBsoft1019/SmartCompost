@@ -76,11 +76,19 @@ class _PerfilScreenState extends State<PerfilScreen> {
   Future<void> _cambiarFoto() async {
     setState(() => _errorFoto = null);
     try {
-      final archivo = await _picker.pickImage(source: ImageSource.gallery);
+      // Las fotos del celular suelen pesar más de 5 MB: se achican en el
+      // dispositivo antes de subirlas (la API igual la deja en 256x256).
+      final archivo = await _picker.pickImage(
+        source: ImageSource.gallery,
+        maxWidth: 1024,
+        maxHeight: 1024,
+        imageQuality: 85,
+      );
       if (archivo == null) return; // el usuario cancelo
       final bytes = await archivo.readAsBytes();
       if (bytes.length > 5 * 1024 * 1024) {
-        setState(() => _errorFoto = 'La imagen supera el máximo de 5 MB');
+        setState(() => _errorFoto =
+            'No se pudo reducir la imagen por debajo de 5 MB. Prueba con otra foto.');
         return;
       }
       setState(() => _subiendoFoto = true);
@@ -123,7 +131,7 @@ class _PerfilScreenState extends State<PerfilScreen> {
     final u = Session.instance.usuario!;
     return Scaffold(
       appBar: AppBar(
-          backgroundColor: AppColors.background, title: const Text('Mi perfil')),
+          title: const Text('Mi perfil')),
       body: Center(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(20),
@@ -167,7 +175,7 @@ class _PerfilScreenState extends State<PerfilScreen> {
                   ]),
                   const Padding(
                     padding: EdgeInsets.only(top: 6),
-                    child: Text('PNG, JPG o WEBP · máximo 5 MB',
+                    child: Text('PNG, JPG o WEBP · se ajusta automáticamente',
                         style: TextStyle(color: AppColors.textMuted, fontSize: 11.5)),
                   ),
                   if (_errorFoto != null)
