@@ -104,7 +104,7 @@ class _UsuariosScreenState extends State<UsuariosScreen> {
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Wrap(spacing: 14, runSpacing: 10, crossAxisAlignment: WrapCrossAlignment.center, children: [
             const Text('Perfiles de usuario',
-                style: TextStyle(fontSize: 22, fontWeight: FontWeight.w800)),
+                style: TextStyle(fontSize: 26, fontFamily: AppFonts.titulo, color: AppColors.accentDark)),
             SizedBox(
               width: 170,
               child: ElevatedButton.icon(

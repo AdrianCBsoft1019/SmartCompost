@@ -185,7 +185,7 @@ class _SensoresScreenState extends State<SensoresScreen> {
       crossAxisAlignment: WrapCrossAlignment.center,
       children: [
         const Text('Sensores',
-            style: TextStyle(fontSize: 22, fontWeight: FontWeight.w800)),
+            style: TextStyle(fontSize: 26, fontFamily: AppFonts.titulo, color: AppColors.accentDark)),
         SizedBox(
           width: esMovil(context) ? double.infinity : 260,
           child: TextField(
@@ -341,7 +341,7 @@ class _SensoresScreenState extends State<SensoresScreen> {
         padding: const EdgeInsets.all(10),
         decoration: BoxDecoration(
           border: Border.all(color: AppColors.border),
-          borderRadius: BorderRadius.circular(10),
+          borderRadius: BorderRadius.circular(18),
         ),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Text(etiqueta,
@@ -370,7 +370,7 @@ class _SensoresScreenState extends State<SensoresScreen> {
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: AppColors.surface,
-        borderRadius: BorderRadius.circular(14),
+        borderRadius: BorderRadius.circular(24),
         border: Border.all(
             color: s.danado ? EstadoColores.rojo : AppColors.border),
       ),
@@ -413,7 +413,7 @@ class _SensoresScreenState extends State<SensoresScreen> {
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
               color: AppColors.accent.withValues(alpha: 0.5),
-              borderRadius: BorderRadius.circular(10),
+              borderRadius: BorderRadius.circular(18),
             ),
             child: Icon(_icono(s.tipo), color: AppColors.accent, size: 22),
           ),
@@ -453,11 +453,11 @@ class _SensoresScreenState extends State<SensoresScreen> {
 
   Widget _tarjetaNueva() {
     return InkWell(
-      borderRadius: BorderRadius.circular(14),
+      borderRadius: BorderRadius.circular(24),
       onTap: _crear,
       child: Container(
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(14),
+          borderRadius: BorderRadius.circular(24),
           border: Border.all(color: AppColors.border, width: 1.5),
         ),
         child: const Center(

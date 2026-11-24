@@ -24,7 +24,7 @@ class PanelCard extends StatelessWidget {
       padding: padding,
       decoration: BoxDecoration(
         color: AppColors.surface,
-        borderRadius: BorderRadius.circular(14),
+        borderRadius: BorderRadius.circular(24),
         border: Border.all(color: AppColors.border),
       ),
       child: Column(

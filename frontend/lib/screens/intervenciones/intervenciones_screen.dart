@@ -710,8 +710,9 @@ class _IntervencionesScreenState extends State<IntervencionesScreen> {
                 'Historial de Acciones e Intervenciones',
                 maxLines: 2,
                 style: TextStyle(
-                  fontSize: MediaQuery.sizeOf(context).width < 700 ? 18 : 22,
-                  fontWeight: FontWeight.w800,
+                  fontSize: MediaQuery.sizeOf(context).width < 700 ? 22 : 26,
+                  fontFamily: AppFonts.titulo,
+                  color: AppColors.accentDark,
                 ),
               ),
             ),
@@ -738,7 +739,7 @@ class _IntervencionesScreenState extends State<IntervencionesScreen> {
                               height: 18,
                               child: CircularProgressIndicator(
                                 strokeWidth: 2,
-                                color: Colors.black,
+                                color: Colors.white,
                               ),
                             )
                           : const Icon(
@@ -752,13 +753,13 @@ class _IntervencionesScreenState extends State<IntervencionesScreen> {
                       ),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: AppColors.accent,
-                        foregroundColor: Colors.black,
+                        foregroundColor: Colors.white,
                         padding: const EdgeInsets.symmetric(
                           horizontal: 18,
                           vertical: 14,
                         ),
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
+                          borderRadius: BorderRadius.circular(18),
                         ),
                       ),
                     ),
@@ -804,7 +805,7 @@ class _IntervencionesScreenState extends State<IntervencionesScreen> {
                                 padding: const EdgeInsets.all(16),
                                 decoration: BoxDecoration(
                                   color: AppColors.surface,
-                                  borderRadius: BorderRadius.circular(14),
+                                  borderRadius: BorderRadius.circular(24),
                                   border: Border.all(
                                     color: AppColors.border,
                                   ),

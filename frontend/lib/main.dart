@@ -14,7 +14,7 @@ class SmartCompostApp extends StatelessWidget {
     return MaterialApp(
       title: 'SmartCompost',
       debugShowCheckedModeBanner: false,
-      theme: AppTheme.dark,
+      theme: AppTheme.claro,
       home: const LoginScreen(),
     );
   }

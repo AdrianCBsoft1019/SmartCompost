@@ -97,7 +97,7 @@ class _AnalisisScreenState extends State<AnalisisScreen> {
       crossAxisAlignment: WrapCrossAlignment.center,
       children: [
         const Text('Análisis',
-            style: TextStyle(fontSize: 22, fontWeight: FontWeight.w800)),
+            style: TextStyle(fontSize: 26, fontFamily: AppFonts.titulo, color: AppColors.accentDark)),
         SegmentedButton<String>(
           showSelectedIcon: false,
           segments: [
@@ -125,7 +125,7 @@ class _AnalisisScreenState extends State<AnalisisScreen> {
                 ? const SizedBox(
                     width: 16,
                     height: 16,
-                    child: CircularProgressIndicator(strokeWidth: 2, color: Colors.black))
+                    child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
                 : const Icon(Icons.download, size: 18),
             label: const Text('Descargar PDF'),
           ),
@@ -415,7 +415,7 @@ class _AnalisisScreenState extends State<AnalisisScreen> {
                   padding: const EdgeInsets.all(14),
                   decoration: BoxDecoration(
                     border: Border.all(color: AppColors.border),
-                    borderRadius: BorderRadius.circular(10),
+                    borderRadius: BorderRadius.circular(18),
                   ),
                   child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,

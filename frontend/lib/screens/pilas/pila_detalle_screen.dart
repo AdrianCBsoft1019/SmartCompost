@@ -125,7 +125,7 @@ class _PilaDetalleScreenState extends State<PilaDetalleScreen> {
           crossAxisAlignment: WrapCrossAlignment.center,
           children: [
             Text(d.pila.nombre,
-                style: const TextStyle(fontSize: 26, fontWeight: FontWeight.w800)),
+                style: const TextStyle(fontSize: 28, fontFamily: AppFonts.titulo, color: AppColors.accentDark)),
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
               decoration: BoxDecoration(
@@ -272,7 +272,7 @@ class _PilaDetalleScreenState extends State<PilaDetalleScreen> {
         ),
         const SizedBox(height: 16),
         Text('${d.pila.diasFaltantesFase}',
-            style: const TextStyle(fontSize: 26, fontWeight: FontWeight.w800)),
+            style: const TextStyle(fontSize: 28, fontFamily: AppFonts.titulo, color: AppColors.accentDark)),
         Text(_textoDias(d),
             textAlign: TextAlign.center,
             style: const TextStyle(color: AppColors.textMuted, fontSize: 12)),

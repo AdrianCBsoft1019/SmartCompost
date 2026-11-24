@@ -33,6 +33,15 @@ dev_dependencies:
 flutter:
   uses-material-design: true
 
+  assets:
+    - assets/images/
+
+  fonts:
+    # Fuente de titulos estilo poster (Lilita One, licencia OFL en assets/fonts/OFL.txt)
+    - family: LilitaOne
+      fonts:
+        - asset: assets/fonts/LilitaOne-Regular.ttf
+
 dependency_overrides:
   image: 4.3.0
   archive: 3.6.1

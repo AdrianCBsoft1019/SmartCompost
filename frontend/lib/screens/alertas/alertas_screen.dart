@@ -124,7 +124,7 @@ class _AlertasScreenState extends State<AlertasScreen> {
       crossAxisAlignment: WrapCrossAlignment.center,
       children: [
         const Text('Alertas',
-            style: TextStyle(fontSize: 22, fontWeight: FontWeight.w800)),
+            style: TextStyle(fontSize: 26, fontFamily: AppFonts.titulo, color: AppColors.accentDark)),
         SegmentedButton<String>(
           showSelectedIcon: false,
           segments: [
@@ -142,7 +142,7 @@ class _AlertasScreenState extends State<AlertasScreen> {
                 ? const SizedBox(
                     width: 16,
                     height: 16,
-                    child: CircularProgressIndicator(strokeWidth: 2, color: Colors.black))
+                    child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
                 : const Icon(Icons.download, size: 18),
             label: const Text('Descargar PDF'),
           ),
@@ -487,7 +487,7 @@ class _AlertasScreenState extends State<AlertasScreen> {
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         border: Border.all(color: AppColors.border),
-        borderRadius: BorderRadius.circular(10),
+        borderRadius: BorderRadius.circular(18),
       ),
       child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Icon(Icons.warning_amber_rounded, color: color, size: 20),

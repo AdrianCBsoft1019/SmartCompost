@@ -94,11 +94,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
     return Container(
       padding: const EdgeInsets.all(32),
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [Color(0xFF102A24), Color(0xFF0B0D10)],
-        ),
+        gradient: kDegradadoVerde,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: AppColors.border),
       ),
@@ -237,7 +233,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   ? const SizedBox(
                       height: 20,
                       width: 20,
-                      child: CircularProgressIndicator(strokeWidth: 2, color: Colors.black),
+                      child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
                     )
                   : const Text('Registrarse'),
             ),

@@ -4,6 +4,8 @@ import '../theme/app_theme.dart';
 import '../services/api_service.dart';
 import '../widgets/app_shell.dart';
 import 'register_screen.dart';
+import 'sobre_nosotros/sobre_nosotros_screen.dart';
+import '../widgets/marca.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -54,7 +56,10 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.background,
-      body: Center(
+      body: Stack(children: [
+        const Positioned(top: 0, left: 0, right: 0, child: OndasPoster(altura: 200)),
+        const Positioned(bottom: 0, left: 0, right: 0, child: OndasPoster(altura: 90, arriba: false)),
+        Center(
         child: SingleChildScrollView(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 32),
           child: ConstrainedBox(
@@ -62,14 +67,36 @@ class _LoginScreenState extends State<LoginScreen> {
             child: Column(
               children: [
                 _buildBrandHeader(),
-                const SizedBox(height: 28),
+                const SizedBox(height: 14),
+                // Pública: los visitantes (por ejemplo, desde el QR del
+                // póster) pueden conocer el proyecto sin tener cuenta.
+                OutlinedButton.icon(
+                  style: OutlinedButton.styleFrom(
+                    backgroundColor: AppColors.amarillo,
+                    foregroundColor: AppColors.accentDark,
+                    side: const BorderSide(color: AppColors.accentDark, width: 1.6),
+                    padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 14),
+                  ),
+                  onPressed: () => Navigator.of(context).push(MaterialPageRoute(
+                      builder: (_) => const SobreNosotrosScreen(pantallaCompleta: true))),
+                  icon: const Icon(Icons.eco),
+                  label: const Text('¡Conoce el proyecto y al equipo!'),
+                ),
+                const SizedBox(height: 18),
                 Container(
                   padding: EdgeInsets.all(
                       MediaQuery.sizeOf(context).width < 420 ? 20 : 28),
                   decoration: BoxDecoration(
                     color: AppColors.surface,
-                    borderRadius: BorderRadius.circular(16),
-                    border: Border.all(color: AppColors.border),
+                    borderRadius: BorderRadius.circular(30),
+                    border: Border.all(color: AppColors.accent, width: 1.6),
+                    boxShadow: [
+                      BoxShadow(
+                        color: AppColors.accentDark.withValues(alpha: 0.15),
+                        blurRadius: 20,
+                        offset: const Offset(0, 8),
+                      ),
+                    ],
                   ),
                   child: Form(
                     key: _formKey,
@@ -77,11 +104,11 @@ class _LoginScreenState extends State<LoginScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         const Text(
-                          'Bienvenido',
+                          '¡Bienvenido!',
                           style: TextStyle(
-                            color: AppColors.textPrimary,
-                            fontSize: 22,
-                            fontWeight: FontWeight.bold,
+                            color: AppColors.accentDark,
+                            fontSize: 28,
+                            fontFamily: AppFonts.titulo,
                           ),
                         ),
                         const SizedBox(height: 6),
@@ -167,7 +194,7 @@ class _LoginScreenState extends State<LoginScreen> {
                               ? const SizedBox(
                                   height: 20,
                                   width: 20,
-                                  child: CircularProgressIndicator(strokeWidth: 2, color: Colors.black),
+                                  child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
                                 )
                               : const Row(
                                   mainAxisAlignment: MainAxisAlignment.center,
@@ -212,30 +239,20 @@ class _LoginScreenState extends State<LoginScreen> {
           ),
         ),
       ),
+      ]),
     );
   }
 
   Widget _buildBrandHeader() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
+    return const Column(
       children: [
-        Container(
-          padding: const EdgeInsets.all(8),
-          decoration: BoxDecoration(
-            color: AppColors.surfaceInput,
-            borderRadius: BorderRadius.circular(8),
-          ),
-          child: const Icon(Icons.eco, color: AppColors.accent, size: 20),
-        ),
-        const SizedBox(width: 10),
-        const Text(
-          'SMARTCOMPOST',
-          style: TextStyle(
-            color: AppColors.textPrimary,
-            fontSize: 20,
-            fontWeight: FontWeight.w800,
-            letterSpacing: 1,
-          ),
+        LogoAnimado(size: 130),
+        NombreMarca(fontSize: 30),
+        SizedBox(height: 2),
+        Text(
+          'Compostaje inteligente: electrónica + software + sostenibilidad',
+          textAlign: TextAlign.center,
+          style: TextStyle(color: AppColors.textSecondary, fontWeight: FontWeight.w600, fontSize: 13),
         ),
       ],
     );
