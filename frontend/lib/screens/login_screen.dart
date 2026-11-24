@@ -56,7 +56,7 @@ class _LoginScreenState extends State<LoginScreen> {
       backgroundColor: AppColors.background,
       body: Center(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 40),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 32),
           child: ConstrainedBox(
             constraints: const BoxConstraints(maxWidth: 420),
             child: Column(
@@ -64,7 +64,8 @@ class _LoginScreenState extends State<LoginScreen> {
                 _buildBrandHeader(),
                 const SizedBox(height: 28),
                 Container(
-                  padding: const EdgeInsets.all(28),
+                  padding: EdgeInsets.all(
+                      MediaQuery.sizeOf(context).width < 420 ? 20 : 28),
                   decoration: BoxDecoration(
                     color: AppColors.surface,
                     borderRadius: BorderRadius.circular(16),
@@ -127,12 +128,14 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                         const SizedBox(height: 12),
 
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        Wrap(
+                          alignment: WrapAlignment.spaceBetween,
+                          crossAxisAlignment: WrapCrossAlignment.center,
                           children: [
                             InkWell(
                               onTap: () => setState(() => _recordarSesion = !_recordarSesion),
                               child: Row(
+                                mainAxisSize: MainAxisSize.min,
                                 children: [
                                   Checkbox(
                                     value: _recordarSesion,

@@ -706,10 +706,11 @@ class _IntervencionesScreenState extends State<IntervencionesScreen> {
               backgroundColor: AppColors.background,
               elevation: 0,
               automaticallyImplyLeading: false,
-              title: const Text(
+              title: Text(
                 'Historial de Acciones e Intervenciones',
+                maxLines: 2,
                 style: TextStyle(
-                  fontSize: 22,
+                  fontSize: MediaQuery.sizeOf(context).width < 700 ? 18 : 22,
                   fontWeight: FontWeight.w800,
                 ),
               ),
