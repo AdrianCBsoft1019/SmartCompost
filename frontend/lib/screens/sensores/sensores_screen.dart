@@ -5,6 +5,7 @@ import '../../providers/notificaciones_provider.dart';
 import '../../providers/sensor_provider.dart';
 import '../../services/session.dart';
 import '../../theme/app_theme.dart';
+import '../../widgets/responsive.dart';
 import '../../widgets/estado_chip.dart';
 import '../../widgets/panel_card.dart';
 import 'sensor_dano_dialog.dart';
@@ -142,19 +143,38 @@ class _SensoresScreenState extends State<SensoresScreen> {
   Widget build(BuildContext context) {
     return ListenableBuilder(
       listenable: _provider,
-      builder: (context, _) => Padding(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _barraSuperior(),
-            const SizedBox(height: 16),
-            _filtros(),
-            const SizedBox(height: 16),
-            Expanded(child: _contenido()),
-          ],
-        ),
-      ),
+      builder: (context, _) {
+        // En el celular toda la pantalla se desplaza junta (filtros y
+        // tarjetas); en escritorio los filtros quedan fijos arriba.
+        if (esMovil(context)) {
+          return SingleChildScrollView(
+            padding: paddingPantalla(context),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _barraSuperior(),
+                const SizedBox(height: 16),
+                _filtros(),
+                const SizedBox(height: 16),
+                _contenido(),
+              ],
+            ),
+          );
+        }
+        return Padding(
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _barraSuperior(),
+              const SizedBox(height: 16),
+              _filtros(),
+              const SizedBox(height: 16),
+              Expanded(child: _contenido()),
+            ],
+          ),
+        );
+      },
     );
   }
 
@@ -167,7 +187,7 @@ class _SensoresScreenState extends State<SensoresScreen> {
         const Text('Sensores',
             style: TextStyle(fontSize: 22, fontWeight: FontWeight.w800)),
         SizedBox(
-          width: 260,
+          width: esMovil(context) ? double.infinity : 260,
           child: TextField(
             decoration: const InputDecoration(
               hintText: 'Buscar por código...',
@@ -259,9 +279,13 @@ class _SensoresScreenState extends State<SensoresScreen> {
     }
     // Altura fija por tarjeta (mainAxisExtent) para que el menu de 3 puntos
     // del admin no desborde la tarjeta.
+    final movil = esMovil(context);
     return GridView(
-      gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
-        maxCrossAxisExtent: 320,
+      shrinkWrap: movil,
+      physics: movil ? const NeverScrollableScrollPhysics() : null,
+      gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
+        // En el celular una sola tarjeta por fila, a todo el ancho.
+        maxCrossAxisExtent: movil ? 600 : 320,
         mainAxisSpacing: 16,
         crossAxisSpacing: 16,
         mainAxisExtent: 235,

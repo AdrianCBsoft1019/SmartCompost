@@ -4,6 +4,7 @@ import '../../models/analisis.dart';
 import '../../providers/analisis_provider.dart';
 import '../../theme/app_theme.dart';
 import '../../utils/descarga.dart';
+import '../../widgets/responsive.dart';
 import '../../widgets/estado_chip.dart';
 import '../../widgets/panel_card.dart';
 
@@ -181,8 +182,13 @@ class _AnalisisScreenState extends State<AnalisisScreen> {
 
   Widget _kpi(String titulo, double? valor, String unidad, IconData icono,
       {Color? color}) {
+    // En el celular: dos tarjetas por fila ocupando todo el ancho
+    // (40 = margen de la pantalla, 14 = espacio entre tarjetas).
+    final ancho = esMovil(context)
+        ? ((MediaQuery.sizeOf(context).width - 40 - 14) / 2).floorToDouble()
+        : 200.0;
     return SizedBox(
-      width: 200,
+      width: ancho,
       child: PanelCard(
         padding: const EdgeInsets.all(16),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [

@@ -128,6 +128,62 @@ class _AppShellState extends State<AppShell> {
     );
   }
 
+  /// Menú lateral (hamburguesa) para celulares: en vez de una barra inferior
+  /// con 7 botones apretados, se listan todas las secciones con su nombre.
+  Widget _menuLateral(List<_Destino> destinos, Usuario? u) {
+    return Drawer(
+      backgroundColor: AppColors.surface,
+      child: SafeArea(
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          const Padding(
+            padding: EdgeInsets.fromLTRB(20, 20, 20, 16),
+            child: Text('SMARTCOMPOST',
+                style: TextStyle(
+                    color: AppColors.accent,
+                    fontSize: 18,
+                    fontWeight: FontWeight.w800,
+                    letterSpacing: 1)),
+          ),
+          Expanded(
+            child: ListView(padding: EdgeInsets.zero, children: [
+              for (var i = 0; i < destinos.length; i++)
+                ListTile(
+                  leading: Icon(destinos[i].icono,
+                      color: i == _indice ? AppColors.accent : AppColors.textSecondary),
+                  title: Text(destinos[i].titulo,
+                      style: TextStyle(
+                          color: i == _indice
+                              ? AppColors.accent
+                              : AppColors.textSecondary,
+                          fontWeight: FontWeight.w600)),
+                  selected: i == _indice,
+                  selectedTileColor: AppColors.accent.withValues(alpha: 0.12),
+                  onTap: () {
+                    Navigator.of(context).pop();
+                    setState(() => _indice = i);
+                  },
+                ),
+            ]),
+          ),
+          const Divider(height: 1),
+          ListTile(
+            leading: _avatar(),
+            title: Text(u?.nombreCompleto ?? '',
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: const TextStyle(fontSize: 13)),
+            subtitle: Text(u?.esAdmin == true ? 'Administrador' : 'Estudiante',
+                style: const TextStyle(color: AppColors.accent, fontSize: 11)),
+            onTap: () {
+              Navigator.of(context).pop();
+              _abrirPerfil();
+            },
+          ),
+        ]),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final destinos = _destinos;
@@ -201,22 +257,15 @@ class _AppShellState extends State<AppShell> {
       return Scaffold(
         appBar: AppBar(
           backgroundColor: AppColors.background,
-          title: Text(actual.titulo),
+          titleSpacing: 0,
+          title: Text(actual.titulo, overflow: TextOverflow.ellipsis),
           actions: [
             const CampanaNotificaciones(),
             Padding(padding: const EdgeInsets.only(right: 14), child: _avatar()),
           ],
         ),
+        drawer: _menuLateral(destinos, u),
         body: contenido,
-        bottomNavigationBar: NavigationBar(
-          backgroundColor: AppColors.surface,
-          selectedIndex: _indice,
-          onDestinationSelected: (i) => setState(() => _indice = i),
-          destinations: [
-            for (final d in destinos)
-              NavigationDestination(icon: Icon(d.icono), label: d.titulo),
-          ],
-        ),
       );
     });
   }

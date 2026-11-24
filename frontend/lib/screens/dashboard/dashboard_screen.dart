@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import '../../widgets/responsive.dart';
 import 'package:fl_chart/fl_chart.dart';
 import '../../providers/pila_provider.dart';
 
@@ -86,15 +87,15 @@ class _DashboardScreenState extends State<DashboardScreen> {
         return Container(
           color: const Color(0xFF121619), // Fondo oscuro
           child: SingleChildScrollView(
-            padding: const EdgeInsets.all(24.0),
+            padding: EdgeInsets.all(esMovil(context) ? 14 : 24),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 // Encabezado
-                const Text(
+                Text(
                   'Panel Principal',
                   style: TextStyle(
-                    fontSize: 28,
+                    fontSize: esMovil(context) ? 22 : 28,
                     fontWeight: FontWeight.bold,
                     color: Colors.white,
                   ),
@@ -107,10 +108,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 const SizedBox(height: 24),
 
                 // 1. Tarjetas de Métricas Superiores
-                Row(
+                FilaAdaptable(
                   children: [
-                    Expanded(
-                      child: _buildMetricCard(
+                    _buildMetricCard(
                         title: 'Temperatura Promedio',
                         value: '${tempPromedio.toInt()}°C',
                         subtitle: 'Estado óptimo de descomposición',
@@ -118,10 +118,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         icon: Icons.thermostat,
                         iconColor: const Color(0xFF10B981),
                       ),
-                    ),
-                    const SizedBox(width: 16),
-                    Expanded(
-                      child: _buildMetricCard(
+                    _buildMetricCard(
                         title: 'Humedad Relativa',
                         value: '${humedadPromedio.toInt()}%',
                         subtitle: 'Mínimo recomendado: 30%',
@@ -130,10 +127,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         icon: Icons.water_drop,
                         iconColor: Colors.blueAccent,
                       ),
-                    ),
-                    const SizedBox(width: 16),
-                    Expanded(
-                      child: _buildAlertCard(
+                    _buildAlertCard(
                         title: 'Niveles del Sistema',
                         status: pilas.any((p) =>
                                 p.temperatura != null &&
@@ -142,20 +136,18 @@ class _DashboardScreenState extends State<DashboardScreen> {
                             : 'ESTABLE',
                         detail: 'Total de pilas en sistema: ${pilas.length}',
                       ),
-                    ),
                   ],
                 ),
 
                 const SizedBox(height: 24),
 
                 // 2. Gráfica + Mini Sección Lateral
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                FilaAdaptable(
+                  flex: const [2, 1],
+                  espacio: 20,
                   children: [
                     // Gráfica de Temperatura
-                    Expanded(
-                      flex: 2,
-                      child: Container(
+                    Container(
                         height: 380,
                         padding: const EdgeInsets.all(20),
                         decoration: BoxDecoration(
@@ -169,12 +161,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                const Text(
-                                  'Evolución de Temperatura (24h)',
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.bold,
+                                const Flexible(
+                                  child: Text(
+                                    'Evolución de Temperatura (24h)',
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold,
+                                    ),
                                   ),
                                 ),
                                 Container(
@@ -200,14 +194,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                           ],
                         ),
                       ),
-                    ),
-
-                    const SizedBox(width: 20),
 
                     // Mini Sección Lateral: Estado de Pilas Reales
-                    Expanded(
-                      flex: 1,
-                      child: Container(
+                    Container(
                         height: 380,
                         padding: const EdgeInsets.all(20),
                         decoration: BoxDecoration(
@@ -261,7 +250,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
                           ],
                         ),
                       ),
-                    ),
                   ],
                 ),
 
@@ -281,19 +269,24 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          const Text(
-                            'Detalle de Sensores Activos (Pilas Reales)',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
+                          const Expanded(
+                            child: Text(
+                              'Detalle de Sensores Activos (Pilas Reales)',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
                           ),
                           Icon(Icons.filter_list, color: Colors.grey[400]),
                         ],
                       ),
                       const SizedBox(height: 16),
-                      _buildSensoresTable(pilas),
+                      TablaDesplazable(
+                        anchoMinimo: 560,
+                        child: _buildSensoresTable(pilas),
+                      ),
                     ],
                   ),
                 ),
@@ -471,12 +464,18 @@ class _DashboardScreenState extends State<DashboardScreen> {
         children: [
           Icon(icon, color: iconColor, size: 20),
           const SizedBox(width: 12),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(title, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-              Text(subtitle, style: TextStyle(color: Colors.grey[500], fontSize: 11)),
-            ],
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(title,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                Text(subtitle,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(color: Colors.grey[500], fontSize: 11)),
+              ],
+            ),
           ),
         ],
       ),

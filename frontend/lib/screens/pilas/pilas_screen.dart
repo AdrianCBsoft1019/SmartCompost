@@ -4,6 +4,7 @@ import '../../models/pila.dart';
 import '../../providers/pila_provider.dart';
 import '../../services/session.dart';
 import '../../theme/app_theme.dart';
+import '../../widgets/responsive.dart';
 import '../../widgets/estado_chip.dart';
 import '../../widgets/panel_card.dart';
 import 'pila_detalle_screen.dart';
@@ -106,19 +107,38 @@ class _PilasScreenState extends State<PilasScreen> {
   Widget build(BuildContext context) {
     return ListenableBuilder(
       listenable: _provider,
-      builder: (context, _) => Padding(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _barraSuperior(),
-            const SizedBox(height: 16),
-            _filtros(),
-            const SizedBox(height: 16),
-            Expanded(child: _contenido()),
-          ],
-        ),
-      ),
+      builder: (context, _) {
+        // En el celular toda la pantalla se desplaza junta (filtros y
+        // tarjetas); en escritorio los filtros quedan fijos arriba.
+        if (esMovil(context)) {
+          return SingleChildScrollView(
+            padding: paddingPantalla(context),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _barraSuperior(),
+                const SizedBox(height: 16),
+                _filtros(),
+                const SizedBox(height: 16),
+                _contenido(),
+              ],
+            ),
+          );
+        }
+        return Padding(
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _barraSuperior(),
+              const SizedBox(height: 16),
+              _filtros(),
+              const SizedBox(height: 16),
+              Expanded(child: _contenido()),
+            ],
+          ),
+        );
+      },
     );
   }
 
@@ -131,7 +151,7 @@ class _PilasScreenState extends State<PilasScreen> {
         const Text('Pilas de Compostaje',
             style: TextStyle(fontSize: 22, fontWeight: FontWeight.w800)),
         SizedBox(
-          width: 260,
+          width: esMovil(context) ? double.infinity : 260,
           child: TextField(
             decoration: const InputDecoration(
               hintText: 'Buscar pila...',
@@ -216,12 +236,16 @@ class _PilasScreenState extends State<PilasScreen> {
     }
     // Altura fija por tarjeta (mainAxisExtent): con childAspectRatio la altura
     // dependia del ancho y la tarjeta del admin (menu de 3 puntos) se desbordaba.
+    final movil = esMovil(context);
     return GridView(
-      gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
-        maxCrossAxisExtent: 320,
+      shrinkWrap: movil,
+      physics: movil ? const NeverScrollableScrollPhysics() : null,
+      gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
+        // En el celular una sola tarjeta por fila, a todo el ancho.
+        maxCrossAxisExtent: movil ? 600 : 320,
         mainAxisSpacing: 16,
         crossAxisSpacing: 16,
-        mainAxisExtent: 330,
+        mainAxisExtent: movil ? 280 : 330,
       ),
       children: [
         for (final p in _provider.pilas) _tarjeta(p),
