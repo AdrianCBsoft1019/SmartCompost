@@ -14,9 +14,9 @@ class SobreNosotrosScreen extends StatelessWidget {
   const SobreNosotrosScreen({super.key, this.pantallaCompleta = false});
 
   static const _equipo = [
-    _Integrante('Nareth Tatiana', 'Ramírez Fuentes', 'NR'),
-    _Integrante('Nicolás Santiago', 'Duarte Tabares', 'ND'),
-    _Integrante('Roderick Adrián', 'Correa Buitrago', 'RC'),
+    _Integrante('Nareth Tatiana', 'Ramírez Fuentes', 'assets/images/equipo_nareth.jpg'),
+    _Integrante('Nicolás Santiago', 'Duarte Tabares', 'assets/images/equipo_santiago.jpg'),
+    _Integrante('Roderick Adrián', 'Correa Buitrago', 'assets/images/equipo_roderick.jpg'),
   ];
 
   static const _pasos = [
@@ -42,7 +42,6 @@ class SobreNosotrosScreen extends StatelessWidget {
   static const _ahora = [
     _Foto('assets/images/prototipo.jpg', 'Nuestro prototipo con volteo, riego y sensores'),
     _Foto('assets/images/plataforma.jpg', 'La plataforma web con datos en tiempo real', 4 / 3),
-    _Foto('assets/images/poster.jpg', 'Póster de INNOVATEC VI'),
   ];
 
   static const _tecnologias = [
@@ -274,7 +273,7 @@ class SobreNosotrosScreen extends StatelessWidget {
     return LayoutBuilder(builder: (context, c) {
       final columnas = movil ? 2 : (fotos.length > 3 ? 4 : 3);
       final ancho = (c.maxWidth - 12 * (columnas - 1)) / columnas;
-      return Wrap(spacing: 12, runSpacing: 12, children: [
+      return Wrap(spacing: 12, runSpacing: 12, alignment: WrapAlignment.center, children: [
         for (final f in fotos) _FotoTarjeta(foto: f, ancho: ancho.floorToDouble()),
       ]);
     });
@@ -290,18 +289,19 @@ class SobreNosotrosScreen extends StatelessWidget {
         border: Border.all(color: AppColors.border),
       ),
       child: Column(children: [
+        // Foto de perfil redonda con borde lima, como el logo.
         Container(
-          width: 76,
-          height: 76,
-          alignment: Alignment.center,
-          decoration: BoxDecoration(
+          width: 120,
+          height: 120,
+          padding: const EdgeInsets.all(4),
+          decoration: const BoxDecoration(
             gradient: kDegradadoVerde,
             shape: BoxShape.circle,
-            border: Border.all(color: AppColors.lima, width: 4),
           ),
-          child: Text(p.iniciales,
-              style: const TextStyle(
-                  fontFamily: AppFonts.titulo, color: Colors.white, fontSize: 26)),
+          child: ClipOval(
+            child: Image.asset(p.foto,
+                fit: BoxFit.cover, semanticLabel: 'Foto de ${p.nombre}'),
+          ),
         ),
         const SizedBox(height: 10),
         Text(p.nombre,
@@ -344,8 +344,8 @@ class SobreNosotrosScreen extends StatelessWidget {
 class _Integrante {
   final String nombre;
   final String apellidos;
-  final String iniciales;
-  const _Integrante(this.nombre, this.apellidos, this.iniciales);
+  final String foto;
+  const _Integrante(this.nombre, this.apellidos, this.foto);
 }
 
 class _Paso {
