@@ -149,7 +149,7 @@ class _PilasScreenState extends State<PilasScreen> {
       crossAxisAlignment: WrapCrossAlignment.center,
       children: [
         const Text('Pilas de Compostaje',
-            style: TextStyle(fontSize: 22, fontWeight: FontWeight.w800)),
+            style: TextStyle(fontSize: 26, fontFamily: AppFonts.titulo, color: AppColors.accentDark)),
         SizedBox(
           width: esMovil(context) ? double.infinity : 260,
           child: TextField(
@@ -260,7 +260,7 @@ class _PilasScreenState extends State<PilasScreen> {
         padding: const EdgeInsets.all(10),
         decoration: BoxDecoration(
           border: Border.all(color: AppColors.border),
-          borderRadius: BorderRadius.circular(10),
+          borderRadius: BorderRadius.circular(18),
         ),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Text(etiqueta,
@@ -282,13 +282,13 @@ class _PilasScreenState extends State<PilasScreen> {
         p.temperatura != null && (p.temperatura! < 15 || p.temperatura! > 45);
     final humFuera = p.humedad != null && p.humedad! < 30;
     return InkWell(
-      borderRadius: BorderRadius.circular(14),
+      borderRadius: BorderRadius.circular(24),
       onTap: () => _abrirDetalle(p),
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
           color: AppColors.surface,
-          borderRadius: BorderRadius.circular(14),
+          borderRadius: BorderRadius.circular(24),
           border: Border.all(color: AppColors.border),
         ),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -352,11 +352,11 @@ class _PilasScreenState extends State<PilasScreen> {
 
   Widget _tarjetaNueva() {
     return InkWell(
-      borderRadius: BorderRadius.circular(14),
+      borderRadius: BorderRadius.circular(24),
       onTap: _crear,
       child: Container(
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(14),
+          borderRadius: BorderRadius.circular(24),
           border: Border.all(color: AppColors.border, width: 1.5),
         ),
         child: const Center(

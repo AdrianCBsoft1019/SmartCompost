@@ -7,6 +7,7 @@ import '../screens/perfil/perfil_screen.dart';
 import '../screens/perfil/usuarios_screen.dart';
 import '../screens/pilas/pilas_screen.dart';
 import '../screens/sensores/sensores_screen.dart';
+import '../screens/sobre_nosotros/sobre_nosotros_screen.dart';
 import '../models/usuario.dart';
 import '../providers/notificaciones_provider.dart';
 import '../screens/login_screen.dart';
@@ -16,6 +17,7 @@ import '../theme/app_theme.dart';
 import 'avatar_usuario.dart';
 import 'campana_notificaciones.dart';
 import 'estado_chip.dart';
+import 'marca.dart';
 
 class _Destino {
   final String titulo;
@@ -105,6 +107,9 @@ class _AppShellState extends State<AppShell> {
     _Destino('Sensores', Icons.sensors, () => const SensoresScreen()),
     _Destino('Usuarios', Icons.people_outline, () => const UsuariosScreen(),
         soloAdmin: true),
+    // Página informativa de solo lectura, visible para todos.
+    _Destino('Sobre nosotros', Icons.info_outline,
+        () => const SobreNosotrosScreen()),
   ];
 
   List<_Destino> get _destinos =>
@@ -128,54 +133,92 @@ class _AppShellState extends State<AppShell> {
     );
   }
 
-  /// Menú lateral (hamburguesa) para celulares: en vez de una barra inferior
-  /// con 7 botones apretados, se listan todas las secciones con su nombre.
-  Widget _menuLateral(List<_Destino> destinos, Usuario? u) {
-    return Drawer(
-      backgroundColor: AppColors.surface,
-      child: SafeArea(
-        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          const Padding(
-            padding: EdgeInsets.fromLTRB(20, 20, 20, 16),
-            child: Text('SMARTCOMPOST',
-                style: TextStyle(
-                    color: AppColors.accent,
-                    fontSize: 18,
-                    fontWeight: FontWeight.w800,
-                    letterSpacing: 1)),
+  /// Menú verde estilo póster. En escritorio va fijo a la izquierda; en el
+  /// celular se abre con el botón de hamburguesa (Drawer).
+  Widget _menu(List<_Destino> destinos, Usuario? u, {required bool enDrawer}) {
+    void ir(int i) {
+      if (enDrawer) Navigator.of(context).pop();
+      setState(() => _indice = i);
+    }
+
+    Widget item(IconData icono, String titulo, bool activo, VoidCallback onTap,
+        {Widget? leading}) {
+      return Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 3),
+        child: Material(
+          color: Colors.transparent,
+          child: InkWell(
+            borderRadius: BorderRadius.circular(30),
+            onTap: onTap,
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 250),
+              curve: Curves.easeOut,
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 11),
+              decoration: BoxDecoration(
+                color: activo ? Colors.white : Colors.transparent,
+                borderRadius: BorderRadius.circular(30),
+                boxShadow: activo
+                    ? [BoxShadow(color: Colors.black.withValues(alpha: 0.15), blurRadius: 8, offset: const Offset(0, 3))]
+                    : null,
+              ),
+              child: Row(children: [
+                IconTheme(
+                  data: IconThemeData(
+                      color: activo ? AppColors.accentDark : Colors.white, size: 22),
+                  child: leading ?? Icon(icono),
+                ),
+                const SizedBox(width: 14),
+                Expanded(
+                  child: Text(titulo,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                          color: activo ? AppColors.accentDark : Colors.white,
+                          fontWeight: FontWeight.w700,
+                          fontSize: 14.5)),
+                ),
+              ]),
+            ),
           ),
+        ),
+      );
+    }
+
+    return Container(
+      decoration: const BoxDecoration(
+        gradient: LinearGradient(
+          colors: [AppColors.accentDark, AppColors.accent],
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+        ),
+      ),
+      child: SafeArea(
+        child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+          const SizedBox(height: 16),
+          const Center(child: LogoAnimado(size: 84)),
+          const Center(child: NombreMarca(fontSize: 22, color: Colors.white)),
+          const SizedBox(height: 14),
           Expanded(
             child: ListView(padding: EdgeInsets.zero, children: [
               for (var i = 0; i < destinos.length; i++)
-                ListTile(
-                  leading: Icon(destinos[i].icono,
-                      color: i == _indice ? AppColors.accent : AppColors.textSecondary),
-                  title: Text(destinos[i].titulo,
-                      style: TextStyle(
-                          color: i == _indice
-                              ? AppColors.accent
-                              : AppColors.textSecondary,
-                          fontWeight: FontWeight.w600)),
-                  selected: i == _indice,
-                  selectedTileColor: AppColors.accent.withValues(alpha: 0.12),
-                  onTap: () {
-                    Navigator.of(context).pop();
-                    setState(() => _indice = i);
-                  },
-                ),
+                item(destinos[i].icono, destinos[i].titulo, i == _indice, () => ir(i)),
             ]),
           ),
-          const Divider(height: 1),
+          if (!enDrawer)
+            item(Icons.notifications, 'Notificaciones', false,
+                () => mostrarNotificaciones(context),
+                leading: const IconoCampana()),
+          const Divider(height: 1, color: Colors.white24),
           ListTile(
             leading: _avatar(),
             title: Text(u?.nombreCompleto ?? '',
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
-                style: const TextStyle(fontSize: 13)),
+                style: const TextStyle(
+                    fontSize: 13, color: Colors.white, fontWeight: FontWeight.w700)),
             subtitle: Text(u?.esAdmin == true ? 'Administrador' : 'Estudiante',
-                style: const TextStyle(color: AppColors.accent, fontSize: 11)),
+                style: const TextStyle(color: AppColors.limaClara, fontSize: 11)),
             onTap: () {
-              Navigator.of(context).pop();
+              if (enDrawer) Navigator.of(context).pop();
               _abrirPerfil();
             },
           ),
@@ -193,62 +236,24 @@ class _AppShellState extends State<AppShell> {
 
     return LayoutBuilder(builder: (context, c) {
       final ancho = c.maxWidth >= 900;
-      final contenido = KeyedSubtree(key: ValueKey(actual.titulo), child: actual.pantalla());
+      // Cambio de sección con un desvanecido + leve deslizamiento.
+      final contenido = AnimatedSwitcher(
+        duration: const Duration(milliseconds: 350),
+        switchInCurve: Curves.easeOutCubic,
+        transitionBuilder: (child, anim) => FadeTransition(
+          opacity: anim,
+          child: SlideTransition(
+            position: Tween(begin: const Offset(0, 0.03), end: Offset.zero).animate(anim),
+            child: child,
+          ),
+        ),
+        child: KeyedSubtree(key: ValueKey(actual.titulo), child: actual.pantalla()),
+      );
 
       if (ancho) {
         return Scaffold(
           body: Row(children: [
-            Container(
-              width: 230,
-              decoration: const BoxDecoration(
-                color: AppColors.surface,
-                border: Border(right: BorderSide(color: AppColors.border)),
-              ),
-              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                const Padding(
-                  padding: EdgeInsets.fromLTRB(20, 28, 20, 24),
-                  child: Text('SMARTCOMPOST',
-                      style: TextStyle(
-                          color: AppColors.accent,
-                          fontSize: 18,
-                          fontWeight: FontWeight.w800,
-                          letterSpacing: 1)),
-                ),
-                for (var i = 0; i < destinos.length; i++)
-                  ListTile(
-                    leading: Icon(destinos[i].icono,
-                        color: i == _indice ? AppColors.accent : AppColors.textSecondary),
-                    title: Text(destinos[i].titulo,
-                        style: TextStyle(
-                            color: i == _indice
-                                ? AppColors.accent
-                                : AppColors.textSecondary,
-                            fontWeight: FontWeight.w600)),
-                    selected: i == _indice,
-                    selectedTileColor: AppColors.accent.withValues(alpha: 0.5),
-                    onTap: () => setState(() => _indice = i),
-                  ),
-                const Spacer(),
-                ListTile(
-                  leading: const IconoCampana(),
-                  title: const Text('Notificaciones',
-                      style: TextStyle(
-                          color: AppColors.textSecondary,
-                          fontWeight: FontWeight.w600)),
-                  onTap: () => mostrarNotificaciones(context),
-                ),
-                ListTile(
-                  leading: _avatar(),
-                  title: Text(u?.nombreCompleto ?? '',
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(fontSize: 13)),
-                  subtitle: Text(u?.esAdmin == true ? 'Administrador' : 'Estudiante',
-                      style: const TextStyle(color: AppColors.accent, fontSize: 11)),
-                  onTap: _abrirPerfil,
-                ),
-              ]),
-            ),
+            SizedBox(width: 240, child: _menu(destinos, u, enDrawer: false)),
             Expanded(child: contenido),
           ]),
         );
@@ -256,7 +261,6 @@ class _AppShellState extends State<AppShell> {
 
       return Scaffold(
         appBar: AppBar(
-          backgroundColor: AppColors.background,
           titleSpacing: 0,
           title: Text(actual.titulo, overflow: TextOverflow.ellipsis),
           actions: [
@@ -264,7 +268,7 @@ class _AppShellState extends State<AppShell> {
             Padding(padding: const EdgeInsets.only(right: 14), child: _avatar()),
           ],
         ),
-        drawer: _menuLateral(destinos, u),
+        drawer: Drawer(child: _menu(destinos, u, enDrawer: true)),
         body: contenido,
       );
     });

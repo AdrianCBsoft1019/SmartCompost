@@ -82,12 +82,12 @@ class _AvatarUsuarioState extends State<AvatarUsuario> {
   Widget build(BuildContext context) {
     return CircleAvatar(
       radius: widget.radius,
-      backgroundColor: AppColors.accentDark,
+      backgroundColor: AppColors.lima,
       foregroundImage: _bytes == null ? null : MemoryImage(_bytes!),
       child: Text(
         widget.usuario.iniciales,
         style: TextStyle(
-            color: Colors.black,
+            color: AppColors.accentDark,
             fontWeight: FontWeight.w800,
             fontSize: widget.radius * 0.62),
       ),

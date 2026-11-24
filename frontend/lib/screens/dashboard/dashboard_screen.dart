@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import '../../widgets/responsive.dart';
+import '../../theme/app_theme.dart';
 import 'package:fl_chart/fl_chart.dart';
 import '../../providers/pila_provider.dart';
 
@@ -85,7 +86,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
         final pilas = _pilaProvider.pilas;
 
         return Container(
-          color: const Color(0xFF121619), // Fondo oscuro
+          color: AppColors.background, 
           child: SingleChildScrollView(
             padding: EdgeInsets.all(esMovil(context) ? 14 : 24),
             child: Column(
@@ -95,15 +96,16 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 Text(
                   'Panel Principal',
                   style: TextStyle(
-                    fontSize: esMovil(context) ? 22 : 28,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
+                    fontSize: esMovil(context) ? 26 : 32,
+                    fontFamily: AppFonts.titulo,
+                    letterSpacing: 0.5,
+                    color: AppColors.accentDark,
                   ),
                 ),
                 const SizedBox(height: 4),
                 Text(
                   'Monitoreo en tiempo real de residuos biológicos',
-                  style: TextStyle(color: Colors.grey[400], fontSize: 14),
+                  style: TextStyle(color: AppColors.textSecondary, fontSize: 14),
                 ),
                 const SizedBox(height: 24),
 
@@ -116,7 +118,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         subtitle: 'Estado óptimo de descomposición',
                         badgeText: '${pilas.length} Pilas',
                         icon: Icons.thermostat,
-                        iconColor: const Color(0xFF10B981),
+                        iconColor: AppColors.accent,
                       ),
                     _buildMetricCard(
                         title: 'Humedad Relativa',
@@ -151,9 +153,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         height: 380,
                         padding: const EdgeInsets.all(20),
                         decoration: BoxDecoration(
-                          color: const Color(0xFF1A1F24),
-                          borderRadius: BorderRadius.circular(16),
-                          border: Border.all(color: Colors.white10),
+                          color: AppColors.surface,
+                          borderRadius: BorderRadius.circular(24),
+                          border: Border.all(color: AppColors.border),
                         ),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -165,9 +167,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                   child: Text(
                                     'Evolución de Temperatura (24h)',
                                     style: TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.bold,
+                                      color: AppColors.textPrimary,
+                                      fontSize: 20,
+                                      fontFamily: AppFonts.titulo,
                                     ),
                                   ),
                                 ),
@@ -175,13 +177,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                   padding: const EdgeInsets.symmetric(
                                       horizontal: 12, vertical: 6),
                                   decoration: BoxDecoration(
-                                    color: const Color(0xFF10B981),
-                                    borderRadius: BorderRadius.circular(8),
+                                    color: AppColors.accent,
+                                    borderRadius: BorderRadius.circular(20),
                                   ),
                                   child: const Text(
                                     'Hoy',
                                     style: TextStyle(
-                                      color: Colors.black,
+                                      color: Colors.white,
                                       fontWeight: FontWeight.bold,
                                       fontSize: 12,
                                     ),
@@ -200,9 +202,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         height: 380,
                         padding: const EdgeInsets.all(20),
                         decoration: BoxDecoration(
-                          color: const Color(0xFF1A1F24),
-                          borderRadius: BorderRadius.circular(16),
-                          border: Border.all(color: Colors.white10),
+                          color: AppColors.surface,
+                          borderRadius: BorderRadius.circular(24),
+                          border: Border.all(color: AppColors.border),
                         ),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -210,9 +212,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                             const Text(
                               'Estado de Pilas',
                               style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
+                                color: AppColors.textPrimary,
+                                fontSize: 20,
+                                fontFamily: AppFonts.titulo,
                               ),
                             ),
                             const SizedBox(height: 16),
@@ -220,7 +222,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                               child: pilas.isEmpty
                                   ? const Center(
                                       child: Text('No hay pilas registradas',
-                                          style: TextStyle(color: Colors.grey)))
+                                          style: TextStyle(color: AppColors.textMuted)))
                                   : ListView(
                                       children: [
                                         for (final p in pilas)
@@ -228,7 +230,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                             p.nombre,
                                             'Etapa: ${p.faseLabel}',
                                             Icons.eco,
-                                            const Color(0xFF10B981),
+                                            AppColors.accent,
                                           ),
                                       ],
                                     ),
@@ -240,10 +242,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                 children: const [
                                   Text(
                                     'Ver todas las pilas',
-                                    style: TextStyle(color: Color(0xFF10B981), fontWeight: FontWeight.bold),
+                                    style: TextStyle(color: AppColors.accent, fontWeight: FontWeight.bold),
                                   ),
                                   SizedBox(width: 6),
-                                  Icon(Icons.arrow_forward, color: Color(0xFF10B981), size: 16),
+                                  Icon(Icons.arrow_forward, color: AppColors.accent, size: 16),
                                 ],
                               ),
                             )
@@ -259,9 +261,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 Container(
                   padding: const EdgeInsets.all(20),
                   decoration: BoxDecoration(
-                    color: const Color(0xFF1A1F24),
-                    borderRadius: BorderRadius.circular(16),
-                    border: Border.all(color: Colors.white10),
+                    color: AppColors.surface,
+                    borderRadius: BorderRadius.circular(24),
+                    border: Border.all(color: AppColors.border),
                   ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -273,13 +275,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
                             child: Text(
                               'Detalle de Sensores Activos (Pilas Reales)',
                               style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
+                                color: AppColors.textPrimary,
+                                fontSize: 20,
+                                fontFamily: AppFonts.titulo,
                               ),
                             ),
                           ),
-                          Icon(Icons.filter_list, color: Colors.grey[400]),
+                          Icon(Icons.filter_list, color: AppColors.textSecondary),
                         ],
                       ),
                       const SizedBox(height: 16),
@@ -305,16 +307,16 @@ class _DashboardScreenState extends State<DashboardScreen> {
     required String value,
     required String subtitle,
     required String badgeText,
-    Color badgeColor = const Color(0xFF10B981),
+    Color badgeColor = AppColors.accent,
     required IconData icon,
     required Color iconColor,
   }) {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: const Color(0xFF1A1F24),
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.white10),
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: AppColors.border),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -330,7 +332,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 decoration: BoxDecoration(
                   color: badgeColor.withOpacity(0.2),
-                  borderRadius: BorderRadius.circular(8),
+                  borderRadius: BorderRadius.circular(20),
                 ),
                 child: Text(
                   badgeText,
@@ -340,14 +342,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
             ],
           ),
           const SizedBox(height: 16),
-          Text(title, style: TextStyle(color: Colors.grey[400], fontSize: 13)),
+          Text(title, style: TextStyle(color: AppColors.textSecondary, fontSize: 13)),
           const SizedBox(height: 4),
           Text(
             value,
-            style: const TextStyle(color: Colors.white, fontSize: 32, fontWeight: FontWeight.bold),
+            style: const TextStyle(color: AppColors.textPrimary, fontSize: 32, fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 4),
-          Text(subtitle, style: TextStyle(color: Colors.grey[500], fontSize: 11)),
+          Text(subtitle, style: TextStyle(color: AppColors.textMuted, fontSize: 11)),
         ],
       ),
     );
@@ -362,9 +364,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: esAlerta ? const Color(0xFF2A1719) : const Color(0xFF1A1F24),
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: esAlerta ? Colors.redAccent.withOpacity(0.4) : Colors.white10),
+        color: esAlerta ? const Color(0xFFFDECEC) : AppColors.surface,
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: esAlerta ? Colors.redAccent.withOpacity(0.4) : AppColors.border),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -373,31 +375,31 @@ class _DashboardScreenState extends State<DashboardScreen> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               CircleAvatar(
-                backgroundColor: esAlerta ? Colors.redAccent : const Color(0xFF10B981),
+                backgroundColor: esAlerta ? Colors.redAccent : AppColors.accent,
                 child: Icon(esAlerta ? Icons.warning : Icons.check_circle, color: Colors.white),
               ),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 decoration: BoxDecoration(
-                  color: (esAlerta ? Colors.redAccent : const Color(0xFF10B981)).withOpacity(0.3),
-                  borderRadius: BorderRadius.circular(8),
+                  color: (esAlerta ? Colors.redAccent : AppColors.accent).withOpacity(0.3),
+                  borderRadius: BorderRadius.circular(20),
                 ),
                 child: Text(
                   status,
-                  style: TextStyle(color: esAlerta ? Colors.redAccent : const Color(0xFF10B981), fontWeight: FontWeight.bold, fontSize: 12),
+                  style: TextStyle(color: esAlerta ? Colors.redAccent : AppColors.accent, fontWeight: FontWeight.bold, fontSize: 12),
                 ),
               ),
             ],
           ),
           const SizedBox(height: 16),
-          Text(title, style: TextStyle(color: Colors.grey[400], fontSize: 13)),
+          Text(title, style: TextStyle(color: AppColors.textSecondary, fontSize: 13)),
           const SizedBox(height: 4),
           Text(
             status,
-            style: TextStyle(color: esAlerta ? Colors.redAccent : Colors.white, fontSize: 32, fontWeight: FontWeight.bold),
+            style: TextStyle(color: esAlerta ? Colors.redAccent : AppColors.textPrimary, fontSize: 32, fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 4),
-          Text(detail, style: TextStyle(color: esAlerta ? Colors.redAccent : Colors.grey[500], fontSize: 11)),
+          Text(detail, style: TextStyle(color: esAlerta ? Colors.redAccent : AppColors.textMuted, fontSize: 11)),
         ],
       ),
     );
@@ -409,7 +411,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
         gridData: FlGridData(
           show: true,
           drawVerticalLine: false,
-          getDrawingHorizontalLine: (value) => const FlLine(color: Colors.white12, strokeWidth: 1),
+          getDrawingHorizontalLine: (value) => const FlLine(color: AppColors.border, strokeWidth: 1),
         ),
         titlesData: FlTitlesData(
           rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
@@ -420,13 +422,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
               showTitles: true,
               getTitlesWidget: (value, meta) {
                 switch (value.toInt()) {
-                  case 0: return const Text('00:00', style: TextStyle(color: Colors.grey, fontSize: 10));
-                  case 4: return const Text('04:00', style: TextStyle(color: Colors.grey, fontSize: 10));
-                  case 8: return const Text('08:00', style: TextStyle(color: Colors.grey, fontSize: 10));
-                  case 12: return const Text('12:00', style: TextStyle(color: Colors.grey, fontSize: 10));
-                  case 16: return const Text('16:00', style: TextStyle(color: Colors.grey, fontSize: 10));
-                  case 20: return const Text('20:00', style: TextStyle(color: Colors.grey, fontSize: 10));
-                  case 23: return const Text('23:59', style: TextStyle(color: Colors.grey, fontSize: 10));
+                  case 0: return const Text('00:00', style: TextStyle(color: AppColors.textMuted, fontSize: 10));
+                  case 4: return const Text('04:00', style: TextStyle(color: AppColors.textMuted, fontSize: 10));
+                  case 8: return const Text('08:00', style: TextStyle(color: AppColors.textMuted, fontSize: 10));
+                  case 12: return const Text('12:00', style: TextStyle(color: AppColors.textMuted, fontSize: 10));
+                  case 16: return const Text('16:00', style: TextStyle(color: AppColors.textMuted, fontSize: 10));
+                  case 20: return const Text('20:00', style: TextStyle(color: AppColors.textMuted, fontSize: 10));
+                  case 23: return const Text('23:59', style: TextStyle(color: AppColors.textMuted, fontSize: 10));
                 }
                 return const Text('');
               },
@@ -438,13 +440,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
           LineChartBarData(
             spots: tempSpots,
             isCurved: true,
-            color: const Color(0xFF10B981),
+            color: AppColors.accent,
             barWidth: 3,
             isStrokeCapRound: true,
             dotData: const FlDotData(show: false),
             belowBarData: BarAreaData(
               show: true,
-              color: const Color(0xFF10B981).withOpacity(0.15),
+              color: AppColors.accent.withOpacity(0.15),
             ),
           ),
         ],
@@ -457,8 +459,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.03),
-        borderRadius: BorderRadius.circular(12),
+        color: AppColors.limaClara.withValues(alpha: 0.45),
+        borderRadius: BorderRadius.circular(18),
       ),
       child: Row(
         children: [
@@ -470,10 +472,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
               children: [
                 Text(title,
                     overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                    style: const TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.bold)),
                 Text(subtitle,
                     overflow: TextOverflow.ellipsis,
-                    style: TextStyle(color: Colors.grey[500], fontSize: 11)),
+                    style: TextStyle(color: AppColors.textMuted, fontSize: 11)),
               ],
             ),
           ),
@@ -486,7 +488,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     if (pilas.isEmpty) {
       return const Padding(
         padding: EdgeInsets.all(16.0),
-        child: Text('No hay pilas conectadas para mostrar', style: TextStyle(color: Colors.grey)),
+        child: Text('No hay pilas conectadas para mostrar', style: TextStyle(color: AppColors.textMuted)),
       );
     }
 
@@ -500,7 +502,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
       },
       children: [
         TableRow(
-          decoration: const BoxDecoration(border: Border(bottom: BorderSide(color: Colors.white10))),
+          decoration: const BoxDecoration(border: Border(bottom: BorderSide(color: AppColors.border))),
           children: [
             _buildTableHeader('PILA'),
             _buildTableHeader('UBICACIÓN'),
@@ -511,13 +513,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
         ),
         for (var p in pilas)
           TableRow(
-            decoration: const BoxDecoration(border: Border(bottom: BorderSide(color: Colors.white10))),
+            decoration: const BoxDecoration(border: Border(bottom: BorderSide(color: AppColors.border))),
             children: [
-              Padding(padding: const EdgeInsets.symmetric(vertical: 12.0), child: Text(p.nombre, style: const TextStyle(color: Colors.white))),
-              Padding(padding: const EdgeInsets.symmetric(vertical: 12.0), child: Text(p.ubicacion ?? 'Sin ubicar', style: TextStyle(color: Colors.grey[400]))),
-              Padding(padding: const EdgeInsets.symmetric(vertical: 12.0), child: Text(p.faseLabel, style: TextStyle(color: Colors.grey[400]))),
-              Padding(padding: const EdgeInsets.symmetric(vertical: 12.0), child: Text(p.temperatura != null ? '${p.temperatura!.toStringAsFixed(1)} °C' : '--', style: const TextStyle(color: Color(0xFF10B981), fontWeight: FontWeight.bold))),
-              Padding(padding: const EdgeInsets.symmetric(vertical: 12.0), child: Text(p.humedad != null ? '${p.humedad!.toStringAsFixed(0)} %' : '--', style: TextStyle(color: Colors.grey[400]))),
+              Padding(padding: const EdgeInsets.symmetric(vertical: 12.0), child: Text(p.nombre, style: const TextStyle(color: AppColors.textPrimary))),
+              Padding(padding: const EdgeInsets.symmetric(vertical: 12.0), child: Text(p.ubicacion ?? 'Sin ubicar', style: TextStyle(color: AppColors.textSecondary))),
+              Padding(padding: const EdgeInsets.symmetric(vertical: 12.0), child: Text(p.faseLabel, style: TextStyle(color: AppColors.textSecondary))),
+              Padding(padding: const EdgeInsets.symmetric(vertical: 12.0), child: Text(p.temperatura != null ? '${p.temperatura!.toStringAsFixed(1)} °C' : '--', style: const TextStyle(color: AppColors.accent, fontWeight: FontWeight.bold))),
+              Padding(padding: const EdgeInsets.symmetric(vertical: 12.0), child: Text(p.humedad != null ? '${p.humedad!.toStringAsFixed(0)} %' : '--', style: TextStyle(color: AppColors.textSecondary))),
             ],
           ),
       ],
@@ -529,7 +531,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
       padding: const EdgeInsets.symmetric(vertical: 8.0),
       child: Text(
         text,
-        style: TextStyle(color: Colors.grey[500], fontSize: 11, fontWeight: FontWeight.bold),
+        style: TextStyle(color: AppColors.textMuted, fontSize: 11, fontWeight: FontWeight.bold),
       ),
     );
   }
